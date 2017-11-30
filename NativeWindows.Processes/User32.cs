@@ -7,7 +7,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Processes {
     [SuppressUnmanagedCodeSecurity]
     public static partial class User32 {
         const string Library = "User32";

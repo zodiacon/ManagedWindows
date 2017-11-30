@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 
-namespace ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Processes {
     [Flags]
     public enum JobObjectRights {
     }

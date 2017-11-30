@@ -1,9 +1,9 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Threading;
-using static ManagedWindows.Processes.Kernel32;
+using static Zodiacon.ManagedWindows.Processes.Kernel32;
 
-namespace ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Processes {
     public sealed class NativeJob : WaitHandle {
         public static NativeJob CreateNew(string name = null, JobObjectSecurity security = null) {
             return new NativeJob(CreateJobObject(security, name));

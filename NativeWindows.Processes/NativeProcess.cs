@@ -1,19 +1,19 @@
-﻿using ManagedWindows.Core;
+﻿using Zodiacon.ManagedWindows.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ManagedWindows;
+using Zodiacon.ManagedWindows;
 using System.Threading;
-using static ManagedWindows.Processes.Kernel32;
-using static ManagedWindows.Processes.User32;
+using static Zodiacon.ManagedWindows.Processes.Kernel32;
+using static Zodiacon.ManagedWindows.Processes.User32;
 using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 
-namespace ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Processes {
     public sealed class NativeProcess : WaitHandle, IEquatable<NativeProcess> {
         int _id;
 

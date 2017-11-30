@@ -6,7 +6,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagedWindows.Core {
+namespace Zodiacon.ManagedWindows.Core {
     public enum GenericAccessRights : uint {
         Synchronize = 0x1000000,
         WriteDac = 0x40000,

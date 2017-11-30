@@ -1,4 +1,4 @@
-﻿using ManagedWindows.Core;
+﻿using Zodiacon.ManagedWindows.Core;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Processes {
     [Flags]
     enum CreateToolhelpSnapshotFlags {
         None = 0,

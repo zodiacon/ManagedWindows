@@ -1,4 +1,4 @@
-﻿using ManagedWindows.Processes;
+﻿using Zodiacon.ManagedWindows.Processes;
 using Prism.Commands;
 using Prism.Mvvm;
 using QSliceX.Models;

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagedWindows {
+namespace Zodiacon.ManagedWindows {
     public static class Extensions {
         public static IntPtr ThrowIfFailed(this IntPtr handle) {
             if (handle == IntPtr.Zero)
