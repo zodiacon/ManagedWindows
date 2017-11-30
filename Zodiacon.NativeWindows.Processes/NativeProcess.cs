@@ -121,6 +121,8 @@ namespace Zodiacon.ManagedWindows.Processes {
             ProcessExited?.Invoke(this, EventArgs.Empty);
         }
 
+        public int SessionId => ProcessIdToSessionId(Id, out var sessionId) ? sessionId : -1;
+
         public static ProcessInfo[] EnumProcesses() {
             using (var handle = CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapProcess)) {
                 if (handle == null)

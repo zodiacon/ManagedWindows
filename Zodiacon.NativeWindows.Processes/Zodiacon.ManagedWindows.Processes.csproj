@@ -52,7 +52,7 @@
     <Compile Include="User32.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
+    <ProjectReference Include="..\Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
       <Project>{47E49350-366C-484D-A17A-DEE5038147E1}</Project>
       <Name>Zodiacon.ManagedWindows.Core</Name>
     </ProjectReference>

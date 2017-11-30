@@ -223,8 +223,12 @@ namespace Zodiacon.ManagedWindows.Processes {
         internal static extern bool Process32Next(SafeFileHandle hSnapshot, ref ProcessEntry pe);
         [DllImport(Library, CharSet = CharSet.Unicode)]
         internal static extern bool Module32First(SafeFileHandle hSnapshot, ref ModuleEntry pe);
+
         [DllImport(Library, CharSet = CharSet.Unicode)]
         internal static extern bool Module32Next(SafeFileHandle hSnapshot, ref ModuleEntry pe);
+
+        [DllImport(Library, CharSet = CharSet.Unicode)]
+        internal static extern bool ProcessIdToSessionId(int pid, out int sessionid);
 
     }
 }

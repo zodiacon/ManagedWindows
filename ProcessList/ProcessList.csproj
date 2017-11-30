@@ -49,7 +49,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
+    <ProjectReference Include="..\Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
       <Project>{A9A06FB8-3B46-4BC3-98D6-625A981E57E1}</Project>
       <Name>Zodiacon.ManagedWindows.Processes</Name>
     </ProjectReference>

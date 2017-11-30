@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27128.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Core", "ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj", "{47E49350-366C-484D-A17A-DEE5038147E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Core", "Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj", "{47E49350-366C-484D-A17A-DEE5038147E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Processes", "NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj", "{A9A06FB8-3B46-4BC3-98D6-625A981E57E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Processes", "Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj", "{A9A06FB8-3B46-4BC3-98D6-625A981E57E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}"
 EndProject

@@ -156,7 +156,7 @@
     <Resource Include="Images\cpu.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
+    <ProjectReference Include="..\Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
       <Project>{a9a06fb8-3b46-4bc3-98d6-625a981e57e1}</Project>
       <Name>Zodiacon.ManagedWindows.Processes</Name>
     </ProjectReference>
