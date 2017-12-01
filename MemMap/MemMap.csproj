@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9A06FB8-3B46-4BC3-98D6-625A981E57E1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Zodiacon.ManagedWindows.Processes</RootNamespace>
-    <AssemblyName>Zodiacon.ManagedWindows.Processes</AssemblyName>
+    <ProjectGuid>{38CD96D2-B387-4B59-8EEE-C0C807705077}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MemMap</RootNamespace>
+    <AssemblyName>MemMap</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -20,16 +21,15 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,21 +42,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MemoryMap.cs" />
-    <Compile Include="MemoryRegion.cs" />
-    <Compile Include="ModuleInfo.cs" />
-    <Compile Include="NativeJob.cs" />
-    <Compile Include="NativeProcess.cs" />
-    <Compile Include="JobObjectSecurity.cs" />
-    <Compile Include="ProcessInfo.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Kernel32.cs" />
-    <Compile Include="User32.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
-      <Project>{47E49350-366C-484D-A17A-DEE5038147E1}</Project>
-      <Name>Zodiacon.ManagedWindows.Core</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
+      <Project>{a9a06fb8-3b46-4bc3-98d6-625a981e57e1}</Project>
+      <Name>Zodiacon.ManagedWindows.Processes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

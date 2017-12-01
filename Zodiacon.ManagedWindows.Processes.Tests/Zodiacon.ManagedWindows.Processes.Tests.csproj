@@ -55,13 +55,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ManagedWindows.Core\ManagedWindows.Core.csproj">
+    <ProjectReference Include="..\Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
       <Project>{47e49350-366c-484d-a17a-dee5038147e1}</Project>
-      <Name>ManagedWindows.Core</Name>
+      <Name>Zodiacon.ManagedWindows.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NativeWindows.Processes\ManagedWindows.Processes.csproj">
+    <ProjectReference Include="..\Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
       <Project>{a9a06fb8-3b46-4bc3-98d6-625a981e57e1}</Project>
-      <Name>ManagedWindows.Processes</Name>
+      <Name>Zodiacon.ManagedWindows.Processes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

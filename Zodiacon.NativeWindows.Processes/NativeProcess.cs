@@ -35,8 +35,11 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         private NativeProcess(int pid, ProcessAccessMask accessMask = ProcessAccessMask.QueryLimitedInformation, bool inheritHandle = false) {
             _id = pid;
-            if (pid > 0)
+            if (pid > 0) {
                 SafeWaitHandle = OpenProcess(accessMask, inheritHandle, pid);
+                if (SafeWaitHandle.IsInvalid)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
         }
 
         public void RegisterForExit() {

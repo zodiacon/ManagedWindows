@@ -110,7 +110,7 @@ namespace Zodiacon.ManagedWindows.Processes {
         CreateProcess = 0x80,
         CreateThread = 2,
         DupHandle = 0x40,
-        QueryInformation = 0x40,
+        QueryInformation = 0x400,
         QueryLimitedInformation = 0x1000,
         SetInformation = 0x200,
         SetQuota = 0x100,
@@ -155,6 +155,46 @@ namespace Zodiacon.ManagedWindows.Processes {
     public enum ThreadCreateFlags : uint {
         None = 0,
         StackSizeIsReservation = 0x80
+    }
+
+    [Flags]
+    public enum PageProtection {
+        Invalid = 0,
+        ReadOnly = 2,
+        Execute = 0x10,
+        ExecuteRead = 0x20,
+        ExecuteReadWrite = 0x40,
+        ExecuteWriteCopy = 0x80,
+        NoAccess = 1,
+        ReadWrite = 4,
+        WriteCopy = 8,
+        Guard = 0x100,
+        NoCache = 0x200,
+        WriteCombine = 0x400
+    }
+
+    public enum PageType {
+        Invalid = 0,
+        Image = 0x10000000,
+        Mapped = 0x40000,
+        Private = 0x20000
+    }
+
+    public enum PageState {
+        Free = 0x10000,
+        Committed = 0x1000,
+        Reserved = 0x2000
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct MemoryBasicInformation {
+        public IntPtr BaseAddress;
+        public IntPtr AllocationBase;
+        public PageProtection AllocationProtect;
+        public IntPtr RegionSize;
+        public PageState State;
+        public PageProtection Protect;
+        public PageType Type;
     }
 
     public delegate uint ThreadProc(IntPtr param);
@@ -204,6 +244,7 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library, SetLastError = true)]
         public static extern SafeWaitHandle OpenThread(ThreadAccessMask accessMask, bool inheritHandle, int threadId);
+
         [DllImport(Library, SetLastError = true)]
         public static extern IntPtr CreateThread(IntPtr securityAttributes, UIntPtr stackSize, ThreadProc proc, IntPtr parameter, uint flags, out uint id);
 
@@ -229,6 +270,9 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library, CharSet = CharSet.Unicode)]
         internal static extern bool ProcessIdToSessionId(int pid, out int sessionid);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern IntPtr VirtualQueryEx(SafeWaitHandle hProcess, IntPtr address, out MemoryBasicInformation mbi, int size);
 
     }
 }
