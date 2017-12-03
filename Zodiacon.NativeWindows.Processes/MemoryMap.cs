@@ -41,7 +41,8 @@ namespace Zodiacon.ManagedWindows.Processes {
                     Protect = mbi.Protect,
                     AllocateProtect = mbi.AllocationProtect,
                     Type = mbi.Type,
-                    State = mbi.State
+                    State = mbi.State,
+                    AllocationBase = mbi.AllocationBase.ToInt64()
                 };
                 address += mbi.RegionSize.ToInt64();
             }

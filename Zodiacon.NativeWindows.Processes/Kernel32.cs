@@ -175,7 +175,7 @@ namespace Zodiacon.ManagedWindows.Processes {
 
     public enum PageType {
         Invalid = 0,
-        Image = 0x10000000,
+        Image = 0x1000000,
         Mapped = 0x40000,
         Private = 0x20000
     }

@@ -19,18 +19,30 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         public event EventHandler ProcessExited;
 
-        public static NativeProcess FromHandle(IntPtr hProcess) {
-            return new NativeProcess(hProcess);
+        public static NativeProcess FromHandle(IntPtr hProcess, bool ownsHandle = true) {
+            return new NativeProcess(hProcess, ownsHandle);
         }
 
         public static NativeProcess Open(ProcessAccessMask accessMask, int pid, bool inheritHandle = false) {
             return new NativeProcess(pid, accessMask, inheritHandle);
         }
 
+        public static NativeProcess TryOpen(ProcessAccessMask accessMask, int pid, bool inheritHandle = false) {
+            var handle = OpenProcess(accessMask, inheritHandle, pid);
+            if (handle == null || handle.IsInvalid)
+                return null;
+
+            return new NativeProcess(handle);
+        }
+
         public int Id => _id == 0 ? (_id = GetProcessId(SafeWaitHandle)) : _id;
 
-        private NativeProcess(IntPtr hProcess) {
-            SafeWaitHandle = new SafeWaitHandle(hProcess, true);
+        private NativeProcess(IntPtr hProcess, bool ownsHandle) {
+            SafeWaitHandle = new SafeWaitHandle(hProcess, ownsHandle);
+        }
+
+        private NativeProcess(SafeWaitHandle hProcess) {
+            SafeWaitHandle = hProcess;
         }
 
         private NativeProcess(int pid, ProcessAccessMask accessMask = ProcessAccessMask.QueryLimitedInformation, bool inheritHandle = false) {
@@ -53,13 +65,13 @@ namespace Zodiacon.ManagedWindows.Processes {
             return inJob;
         }
 
-        public string FullImageName {
-            get {
-                var name = new StringBuilder(300);
-                int size = name.Capacity;
-                QueryFullProcessImageName(SafeWaitHandle, ImageNameType.Normal, name, ref size).ThrowIfWin32Failed();
-                return name.ToString();
-            }
+        public string FullImageName => TryGetFullImageName(ImageNameType.Normal) ?? throw new Win32Exception(Marshal.GetLastWin32Error());
+
+        public string TryGetFullImageName(ImageNameType type = ImageNameType.Normal) {
+            var name = new StringBuilder(300);
+            int size = name.Capacity;
+            QueryFullProcessImageName(SafeWaitHandle, type, name, ref size);
+            return name.ToString();
         }
 
         public bool IsRunning => !WaitOne(0);
