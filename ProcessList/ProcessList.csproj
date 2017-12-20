@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,8 +51,12 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
+      <Project>{47e49350-366c-484d-a17a-dee5038147e1}</Project>
+      <Name>Zodiacon.ManagedWindows.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Zodiacon.NativeWindows.Processes\Zodiacon.ManagedWindows.Processes.csproj">
-      <Project>{A9A06FB8-3B46-4BC3-98D6-625A981E57E1}</Project>
+      <Project>{a9a06fb8-3b46-4bc3-98d6-625a981e57e1}</Project>
       <Name>Zodiacon.ManagedWindows.Processes</Name>
     </ProjectReference>
   </ItemGroup>

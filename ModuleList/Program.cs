@@ -1,9 +1,5 @@
-﻿using Zodiacon.ManagedWindows.Processes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Zodiacon.ManagedWindows.Core;
 
 namespace ModuleList {
     class Program {
@@ -19,7 +15,7 @@ namespace ModuleList {
             }
 
             try {
-                foreach (var module in NativeProcess.EnumModules(pid)) {
+                foreach (var module in SystemInformation.EnumModules(pid)) {
                     Console.WriteLine($"Base: 0x{module.BaseAddress.ToInt64():X} Size: 0x{module.Size:X} Path: {module.FullPath}");
                 }
             }

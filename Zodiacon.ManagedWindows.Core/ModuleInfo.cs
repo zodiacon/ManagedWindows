@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Zodiacon.ManagedWindows.Processes {
+namespace Zodiacon.ManagedWindows.Core {
     public sealed class ModuleInfo {
         internal ModuleInfo() { }
 

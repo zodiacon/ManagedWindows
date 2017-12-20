@@ -138,62 +138,10 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         public int SessionId => ProcessIdToSessionId(Id, out var sessionId) ? sessionId : -1;
 
-        public static ProcessInfo[] EnumProcesses() {
-            using (var handle = CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapProcess)) {
-                if (handle == null)
-                    return null;
-
-                var processes = new List<ProcessInfo>(128);
-                var pe = new ProcessEntry();
-                pe.Init();
-
-                if (!Process32First(handle, ref pe))
-                    return null;
-
-                do {
-                    processes.Add(new ProcessInfo {
-                        Id = pe.th32ProcessID,
-                        ParentId = pe.th32ParentProcessID,
-                        Threads = pe.cntThreads,
-                        Name = pe.szExeFile
-                    });
-                } while (Process32Next(handle, ref pe));
-
-                return processes.ToArray();
-            }
-        }
-
         public ModuleInfo[] EnumModules() {
-            return EnumModules(Id);
+            return SystemInformation.EnumModules(Id);
         }
 
-        public static ModuleInfo[] EnumModules(int pid) {
-            using (var handle = CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapModules | 
-                (Environment.Is64BitProcess ? CreateToolhelpSnapshotFlags.SnapModules32 : CreateToolhelpSnapshotFlags.None), pid)) {
-                if (handle == null)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                var modules = new List<ModuleInfo>(128);
-                var me = new ModuleEntry();
-                me.Init();
-
-                if (!Module32First(handle, ref me))
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-
-                do {
-                    modules.Add(new ModuleInfo {
-                        Pid = pid,
-                        Name = me.szModule,
-                        FullPath = me.szExePath,
-                        BaseAddress = me.modBaseAddr,
-                        Size = me.modBaseSize,
-                        Handle = me.hModule
-                    });
-                } while (Module32Next(handle, ref me));
-
-                return modules.ToArray();
-            }
-        }
 
         public bool IsImmersive => IsImmersiveProcess(SafeWaitHandle);
 

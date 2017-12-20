@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Zodiacon.ManagedWindows.Core;
 
 namespace QSliceX.ViewModels {
     class MainViewModel : BindableBase {
@@ -99,7 +100,7 @@ namespace QSliceX.ViewModels {
         }
 
         private Dictionary<int, ProcessViewModel> GetCurrentCpuTimes() {
-            return (from p in NativeProcess.EnumProcesses()
+            return (from p in SystemInformation.EnumProcesses()
                     let id = p.Id
                     where id != 0
                     let process = NativeProcess.Open(ProcessAccessMask.QueryLimitedInformation, p.Id)

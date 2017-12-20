@@ -35,47 +35,6 @@ namespace Zodiacon.ManagedWindows.Processes {
         public IntPtr PrivateUsage;
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    struct ModuleEntry {
-        int Size;
-        public int th32ModuleID;
-        public int th32ProcessID;
-        public int GlblcntUsage;
-        public int ProccntUsage;
-        public IntPtr modBaseAddr;
-        public uint modBaseSize;
-        public IntPtr hModule;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string szModule;
-
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szExePath;
-
-        public void Init() {
-            Size = Marshal.SizeOf<ModuleEntry>();
-        }
-    }
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    struct ProcessEntry {
-        public int dwSize;
-        public uint cntUsage;
-        public int th32ProcessID;
-        public UIntPtr th32DefaultHeapID;
-        public uint th32ModuleID;
-        public int cntThreads;
-        public int th32ParentProcessID;
-        public ProcessPriorityClass pcPriClassBase;
-        public uint dwFlags;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szExeFile;
-
-        public void Init() {
-            dwSize = Marshal.SizeOf<ProcessEntry>();
-        }
-
-    }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct IO_COUNTERS {
@@ -197,6 +156,7 @@ namespace Zodiacon.ManagedWindows.Processes {
         public PageType Type;
     }
 
+
     public delegate uint ThreadProc(IntPtr param);
 
     [SuppressUnmanagedCodeSecurity]
@@ -256,17 +216,6 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library, SetLastError = true)]
         internal static extern bool GetProcessMemoryInfo(SafeWaitHandle hProcess, out ProcessMemoryCounters counters, int size);
-
-
-        [DllImport(Library, CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool Process32First(SafeFileHandle hSnapshot, ref ProcessEntry pe);
-        [DllImport(Library, CharSet = CharSet.Unicode)]
-        internal static extern bool Process32Next(SafeFileHandle hSnapshot, ref ProcessEntry pe);
-        [DllImport(Library, CharSet = CharSet.Unicode)]
-        internal static extern bool Module32First(SafeFileHandle hSnapshot, ref ModuleEntry pe);
-
-        [DllImport(Library, CharSet = CharSet.Unicode)]
-        internal static extern bool Module32Next(SafeFileHandle hSnapshot, ref ModuleEntry pe);
 
         [DllImport(Library, CharSet = CharSet.Unicode)]
         internal static extern bool ProcessIdToSessionId(int pid, out int sessionid);
