@@ -66,10 +66,69 @@ namespace Zodiacon.ManagedWindows.Core {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
         public string szExeFile;
 
-        public void Init() {
+        internal void Init() {
             dwSize = Marshal.SizeOf<ProcessEntry>();
         }
 
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct ThreadEntry {
+        int Size;
+        int Usage;
+        public int ThreadId;
+        public int ProcessId;
+        public int BasePriority;
+        int Deltapriority;
+        int Flags;
+
+        internal void Init() {
+            Size = Marshal.SizeOf<ThreadEntry>();
+        }
+    }
+
+    [Flags]
+    public enum HeapFlags {
+        None = 0,
+        DefaultHeap = 1,
+        SharedHeap = 2,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct HeapList {
+        IntPtr Size;
+        public int ProcessId;
+        public IntPtr HeapId;
+        public HeapFlags Flags;
+
+        public void Init() {
+            Size = new IntPtr(Marshal.SizeOf<HeapList>());
+        }
+    }
+
+    [Flags]
+    public enum HeapEntryFlags {
+        None = 0,
+        Fixed = 1,
+        Free = 2,
+        Moveable = 4
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct HeapEntry {
+        IntPtr Size;
+        public IntPtr Handle;       // Handle of this heap block
+        public IntPtr Address;      // Linear address of start of block
+        public IntPtr BlockSize;  // Size of block in bytes
+        public HeapEntryFlags Flags;
+        uint dwLockCount;
+        uint dwResvd;
+        public int ProcessID;       // owning process
+        IntPtr HeapID;              // heap block is in
+
+        public void Init() {
+            Size = new IntPtr(Marshal.SizeOf<HeapEntry>());
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -94,8 +153,38 @@ namespace Zodiacon.ManagedWindows.Core {
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    struct PERFORMANCE_INFORMATION {
+        int cb;
+        public IntPtr CommitTotal;
+        public IntPtr CommitLimit;
+        public IntPtr CommitPeak;
+        public IntPtr PhysicalTotal;
+        public IntPtr PhysicalAvailable;
+        public IntPtr SystemCache;
+        public IntPtr KernelTotal;
+        public IntPtr KernelPaged;
+        public IntPtr KernelNonpaged;
+        public IntPtr PageSize;
+        public uint HandleCount;
+        public uint ProcessCount;
+        public uint ThreadCount;
+    }
+
+    public enum FirmwareType {
+        Unknown = 0,
+        Bios = 1,
+        Uefi = 2,
+    }
+
+    [Flags]
+    public enum TokenAccessMask : uint {
+    }
+
     [SuppressUnmanagedCodeSecurity]
     static class Win32 {
+        public static readonly IntPtr InvalidFileHandle = new IntPtr(-1);
+
         [DllImport("kernel32", SetLastError = true)]
         public static extern void GetSystemInfo(out SYSTEM_INFO si);
 
@@ -115,6 +204,42 @@ namespace Zodiacon.ManagedWindows.Core {
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         internal static extern bool Module32Next(SafeFileHandle hSnapshot, ref ModuleEntry pe);
+
+        [DllImport("kernel32")]
+        internal static extern bool Thread32First(SafeFileHandle hSnapshot, ref ThreadEntry pe);
+
+        [DllImport("kernel32")]
+        internal static extern bool Thread32Next(SafeFileHandle hSnapshot, ref ThreadEntry pe);
+
+        [DllImport("kernel32")]
+        internal static extern bool Heap32First(ref HeapEntry he, int pid, IntPtr heapId);
+
+        [DllImport("kernel32")]
+        internal static extern bool Heap32Next(ref HeapEntry he);
+
+        [DllImport("kernel32")]
+        internal static extern bool Heap32ListFirst(SafeFileHandle hSnapshot, ref HeapList list);
+
+        [DllImport("kernel32")]
+        internal static extern bool Heap32ListNext(SafeFileHandle hSnapshot, ref HeapList list);
+
+        [DllImport("psapi")]
+        internal static extern bool GetPerformanceInfo(out PERFORMANCE_INFORMATION info, int size);
+
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern bool CloseHandle(IntPtr handle);
+
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern bool OpenProcessToken(SafeWaitHandle hProcess, TokenAccessMask accessMask, out SafeKernelHandle handle);
+
+        [DllImport("kernel32")]
+        internal static extern bool QueryPerformanceCunter(out long counter);
+
+        [DllImport("kernel32")]
+        internal static extern bool QueryPerformanceFrequency(out long counter);
+
+        [DllImport("kernel32")]
+        internal static extern bool GetFirmwareType(out FirmwareType type);
 
     }
 }

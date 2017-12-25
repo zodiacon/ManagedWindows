@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj">
-      <Project>{47E49350-366C-484D-A17A-DEE5038147E1}</Project>
+      <Project>{47e49350-366c-484d-a17a-dee5038147e1}</Project>
       <Name>Zodiacon.ManagedWindows.Core</Name>
     </ProjectReference>
   </ItemGroup>

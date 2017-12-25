@@ -12,12 +12,12 @@ namespace Zodiacon.ManagedWindows.Core {
             _info = info;
         }
 
-        public static SystemInfo GetSystemInfo() {
+        internal static SystemInfo GetSystemInfo() {
             Win32.GetSystemInfo(out var si);
             return new SystemInfo(si);
         }
 
-        public static SystemInfo GetNativeSystemInfo() {
+        internal static SystemInfo GetNativeSystemInfo() {
             Win32.GetNativeSystemInfo(out var si);
             return new SystemInfo(si);
         }

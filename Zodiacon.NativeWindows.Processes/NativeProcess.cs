@@ -142,7 +142,6 @@ namespace Zodiacon.ManagedWindows.Processes {
             return SystemInformation.EnumModules(Id);
         }
 
-
         public bool IsImmersive => IsImmersiveProcess(SafeWaitHandle);
 
         public ProcessMemoryCounters GetMemoryCounters() => 

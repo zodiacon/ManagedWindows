@@ -10,8 +10,8 @@ namespace Zodiacon.ManagedWindows.Core {
     public static class SystemInformation {
         public static ProcessInfo[] EnumProcesses() {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapProcess)) {
-                if (handle == null)
-                    return null;
+                if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 var processes = new List<ProcessInfo>(128);
                 var pe = new ProcessEntry();
@@ -33,10 +33,30 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
+        public static ThreadInfo[] EnumThreads() {
+            using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapThread)) {
+                if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                var threads = new List<ThreadInfo>(1024);
+                var te = new ThreadEntry();
+                te.Init();
+
+                if (!Win32.Thread32First(handle, ref te))
+                    return null;
+
+                do {
+                    threads.Add(new ThreadInfo(te));
+                } while (Win32.Thread32Next(handle, ref te));
+
+                return threads.ToArray();
+            }
+        }
+
         public static ModuleInfo[] EnumModules(int pid) {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapModules |
                 (Environment.Is64BitProcess ? CreateToolhelpSnapshotFlags.SnapModules32 : CreateToolhelpSnapshotFlags.None), pid)) {
-                if (handle == null)
+                if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 var modules = new List<ModuleInfo>(128);
@@ -59,6 +79,45 @@ namespace Zodiacon.ManagedWindows.Core {
 
                 return modules.ToArray();
             }
+        }
+
+        public static HeapInfo[] EnumHeaps(int pid) {
+            using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapHeapList, pid)) {
+                if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                var heaps = new List<HeapInfo>(8);
+                var hi = new HeapList();
+                hi.Init();
+
+                if (!Win32.Heap32ListFirst(handle, ref hi))
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+
+                do {
+                    var heapInfo = new HeapInfo(hi, pid);
+                    heaps.Add(heapInfo);
+                } while (Win32.Heap32ListNext(handle, ref hi));
+
+                return heaps.ToArray();
+            }
+        }
+
+        public static long PerformanceCounter => Win32.QueryPerformanceCunter(out var counter) ? counter : 0;
+
+        public static long PerformanceFrequency => Win32.QueryPerformanceFrequency(out var freq) ? freq : 0;
+
+        public static FirmwareType FirmwareType => Win32.GetFirmwareType(out var type) ? type : FirmwareType.Unknown;
+
+        public static PerformanceInformation GetPerformanceInformation() {
+            return new PerformanceInformation();
+        }
+
+        public static SystemInfo GetSystemInfo() {
+            return SystemInfo.GetSystemInfo();
+        }
+
+        public static SystemInfo GetNativeSystemInfo() {
+            return SystemInfo.GetNativeSystemInfo();
         }
 
     }

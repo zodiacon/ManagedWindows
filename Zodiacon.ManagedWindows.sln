@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27128.1
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Core", "Zodiacon.ManagedWindows.Core\Zodiacon.ManagedWindows.Core.csproj", "{47E49350-366C-484D-A17A-DEE5038147E1}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemMap", "MemMap\MemMap.csproj", "{38CD96D2-B387-4B59-8EEE-C0C807705077}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysInfo", "SysInfo\SysInfo.csproj", "{CF10B7FF-FDB3-406D-B068-00B1BC903E90}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeapList", "HeapList\HeapList.csproj", "{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,10 @@ Global
 		{CF10B7FF-FDB3-406D-B068-00B1BC903E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF10B7FF-FDB3-406D-B068-00B1BC903E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF10B7FF-FDB3-406D-B068-00B1BC903E90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +69,7 @@ Global
 		{1C9418ED-18E0-4B34-9AD0-21717E721EC5} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 		{38CD96D2-B387-4B59-8EEE-C0C807705077} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 		{CF10B7FF-FDB3-406D-B068-00B1BC903E90} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
+		{AF569AD3-0FF7-4CB6-BFB5-36FA6B4C4F3B} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6B161822-4FD6-4C00-BFE0-E95C08A1D6AA}
