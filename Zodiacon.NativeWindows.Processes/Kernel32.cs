@@ -209,19 +209,25 @@ namespace Zodiacon.ManagedWindows.Processes {
         public static extern IntPtr CreateThread(IntPtr securityAttributes, UIntPtr stackSize, ThreadProc proc, IntPtr parameter, uint flags, out uint id);
 
         [DllImport(Library, SetLastError = true)]
-        public static extern int GetThreadId(SafeWaitHandle hThread);
+        public static extern int GetThreadId(SafeHandle hThread);
 
         [DllImport(Library, SetLastError = true)]
         internal static extern SafeFileHandle CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags flags, int pid = 0);
 
         [DllImport(Library, SetLastError = true)]
-        internal static extern bool GetProcessMemoryInfo(SafeWaitHandle hProcess, out ProcessMemoryCounters counters, int size);
+        internal static extern bool GetProcessMemoryInfo(SafeHandle hProcess, out ProcessMemoryCounters counters, int size);
 
         [DllImport(Library, CharSet = CharSet.Unicode)]
         internal static extern bool ProcessIdToSessionId(int pid, out int sessionid);
 
         [DllImport(Library, SetLastError = true)]
-        internal static extern IntPtr VirtualQueryEx(SafeWaitHandle hProcess, IntPtr address, out MemoryBasicInformation mbi, int size);
+        internal static extern IntPtr VirtualQueryEx(SafeHandle hProcess, IntPtr address, out MemoryBasicInformation mbi, int size);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern bool CheckRemoteDebuggerPresent(SafeWaitHandle hProcess, out bool beingDebugged);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern bool DebugBreakProcess(SafeHandle hProcess);
 
     }
 }

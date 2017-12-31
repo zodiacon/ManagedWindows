@@ -118,7 +118,7 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    struct PROCESS_BASIC_INFORMATION {
+    public struct PROCESS_BASIC_INFORMATION {
         public int ExitStatus;
         public IntPtr PebBaseAddress;
         public UIntPtr AffinityMask;
@@ -335,7 +335,10 @@ namespace Zodiacon.ManagedWindows.Core {
         public static extern int NtQuerySystemInformation(SystemInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
 
         [DllImport(Library, ExactSpelling = true)]
-        public static extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
+        public static extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInformationClass infoClass, IntPtr buffer, int size, out uint actualSize);
+
+        [DllImport(Library, ExactSpelling = true)]
+        public static unsafe extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInformationClass infoClass, void* buffer, int size, int* actualSize = null);
 
         [DllImport(Library, ExactSpelling = true)]
         public static extern int NtQueryInformationThread(IntPtr hThread, ThreadInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);

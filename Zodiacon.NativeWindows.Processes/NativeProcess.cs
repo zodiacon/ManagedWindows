@@ -163,5 +163,22 @@ namespace Zodiacon.ManagedWindows.Processes {
         public override int GetHashCode() {
             return Id ^ StartTime.GetHashCode();
         }
+
+        public bool IsBeingDebugged => CheckRemoteDebuggerPresent(SafeWaitHandle, out var debugged) ? debugged : throw new Win32Exception(Marshal.GetLastWin32Error());
+
+        public void BreakInto() {
+            using (var handle = SafeWaitHandle.Duplicate((uint)ProcessAccessMask.SetInformation)) {
+                Kernel32.DebugBreakProcess(handle);
+            }
+        }
+
+        public unsafe int ParentProcessId {
+            get {
+                PROCESS_BASIC_INFORMATION info;
+                if (NtDll.NtQueryInformationProcess(SafeWaitHandle.DangerousGetHandle(), ProcessInformationClass.BasicInformation, &info, sizeof(PROCESS_BASIC_INFORMATION)) < 0)
+                    return 0;
+                return info.ParentProcessId.ToInt32();
+            }
+        }
     }
 }

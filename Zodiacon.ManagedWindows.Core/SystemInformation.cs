@@ -25,7 +25,7 @@ namespace Zodiacon.ManagedWindows.Core {
                         Id = pe.th32ProcessID,
                         ParentId = pe.th32ParentProcessID,
                         Threads = pe.cntThreads,
-                        Name = pe.szExeFile
+                        Name = pe.th32ProcessID == 0 ? "[System Idle Process]" : pe.szExeFile
                     });
                 } while (Win32.Process32Next(handle, ref pe));
 
@@ -46,7 +46,8 @@ namespace Zodiacon.ManagedWindows.Core {
                     return null;
 
                 do {
-                    threads.Add(new ThreadInfo(te));
+                    if(te.ThreadId != 0)
+                        threads.Add(new ThreadInfo(te));
                 } while (Win32.Thread32Next(handle, ref te));
 
                 return threads.ToArray();

@@ -181,6 +181,13 @@ namespace Zodiacon.ManagedWindows.Core {
     public enum TokenAccessMask : uint {
     }
 
+    [Flags]
+    enum DuplicateHandleOptions {
+        None = 0,
+        CloseSource = 1,
+        SameAccess = 2
+    }
+
     [SuppressUnmanagedCodeSecurity]
     static class Win32 {
         public static readonly IntPtr InvalidFileHandle = new IntPtr(-1);
@@ -240,6 +247,12 @@ namespace Zodiacon.ManagedWindows.Core {
 
         [DllImport("kernel32")]
         internal static extern bool GetFirmwareType(out FirmwareType type);
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern bool DuplicateHandle(IntPtr hSourceProcess, SafeHandle hSource, IntPtr hTargetProcess, out SafeKernelHandle hTarget, 
+            uint accessMask, bool inheritHandle, DuplicateHandleOptions options = DuplicateHandleOptions.None);
+
+        [DllImport("kernel32")]
+        public static extern IntPtr GetCurrentProcess();
 
     }
 }

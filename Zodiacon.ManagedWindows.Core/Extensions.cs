@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Zodiacon.ManagedWindows.Core;
 
 namespace Zodiacon.ManagedWindows {
     public static class Extensions {
@@ -29,6 +30,11 @@ namespace Zodiacon.ManagedWindows {
         public static void ThrowIfWin32Failed(this bool success) {
             if (!success)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        public static SafeHandle Duplicate<Handle>(this Handle handle, uint accessMask) where Handle : SafeHandle {
+            Win32.DuplicateHandle(Win32.GetCurrentProcess(), handle, Win32.GetCurrentProcess(), out var result, accessMask, false, DuplicateHandleOptions.None).ThrowIfWin32Failed();
+            return result;
         }
     }
 }
