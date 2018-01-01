@@ -188,6 +188,17 @@ namespace Zodiacon.ManagedWindows.Core {
         SameAccess = 2
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    struct EnumPageFileInformation {
+        uint cb;
+        uint Reserved;
+        public IntPtr TotalSize;
+        public IntPtr TotalInUse;
+        public IntPtr PeakUsage;
+    }
+
+    delegate bool PageFileEnumProc(IntPtr context, ref EnumPageFileInformation info, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
+
     [SuppressUnmanagedCodeSecurity]
     static class Win32 {
         public static readonly IntPtr InvalidFileHandle = new IntPtr(-1);
@@ -240,19 +251,23 @@ namespace Zodiacon.ManagedWindows.Core {
         public static extern bool OpenProcessToken(SafeWaitHandle hProcess, TokenAccessMask accessMask, out SafeKernelHandle handle);
 
         [DllImport("kernel32")]
-        internal static extern bool QueryPerformanceCunter(out long counter);
+        internal static extern bool QueryPerformanceCounter(out long counter);
 
         [DllImport("kernel32")]
         internal static extern bool QueryPerformanceFrequency(out long counter);
 
         [DllImport("kernel32")]
         internal static extern bool GetFirmwareType(out FirmwareType type);
+
         [DllImport("kernel32", SetLastError = true)]
         public static extern bool DuplicateHandle(IntPtr hSourceProcess, SafeHandle hSource, IntPtr hTargetProcess, out SafeKernelHandle hTarget, 
             uint accessMask, bool inheritHandle, DuplicateHandleOptions options = DuplicateHandleOptions.None);
 
         [DllImport("kernel32")]
         public static extern IntPtr GetCurrentProcess();
+
+        [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern bool EnumPageFiles(PageFileEnumProc proc, IntPtr context);
 
     }
 }

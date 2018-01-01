@@ -15,7 +15,7 @@ namespace ProcessList {
                 if (pi.Id > 0) {
                     try {
                         using (var process = NativeProcess.Open(ProcessAccessMask.QueryLimitedInformation, pi.Id)) {
-                            Console.Write($" Start: {process.StartTime}");
+                            Console.Write($" Start: {process.CreateTime}");
                         }
                     }
                     catch { }

@@ -25,6 +25,15 @@ namespace SysInfo {
             Console.WriteLine($"Kernel Total: {pi.KernelTotal>> 20} MB");
             Console.WriteLine($"Kernel Paged: {pi.KernelPaged>> 20} MB");
             Console.WriteLine($"Kernel NonPaged: {pi.KernelNonPaged >> 20} MB");
+
+            Console.WriteLine($"Perf counter: {SystemInformation.PerformanceCounter}");
+            Console.WriteLine($"Perf frequency: {SystemInformation.PerformanceFrequency}");
+
+            Console.WriteLine();
+            Console.WriteLine("Page files:");
+            foreach (var pf in SystemInformation.EnumPageFiles()) {
+                Console.WriteLine($"Size: {pf.TotalSize >> 20} MB, In use: {pf.TotalInUse >> 20} MB, Peek: {pf.PeakUsage >> 20} MB, Filename: {pf.FileName}");
+            }
         }
     }
 }

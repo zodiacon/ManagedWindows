@@ -33,7 +33,7 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
-        public static ThreadInfo[] EnumThreads() {
+        public static ThreadInfo[] EnumThreads(int pid = -1) {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapThread)) {
                 if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -46,6 +46,8 @@ namespace Zodiacon.ManagedWindows.Core {
                     return null;
 
                 do {
+                    if (pid >= 0 && te.ProcessId != pid)
+                        continue;
                     if(te.ThreadId != 0)
                         threads.Add(new ThreadInfo(te));
                 } while (Win32.Thread32Next(handle, ref te));
@@ -103,7 +105,7 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
-        public static long PerformanceCounter => Win32.QueryPerformanceCunter(out var counter) ? counter : 0;
+        public static long PerformanceCounter => Win32.QueryPerformanceCounter(out var counter) ? counter : 0;
 
         public static long PerformanceFrequency => Win32.QueryPerformanceFrequency(out var freq) ? freq : 0;
 
@@ -119,6 +121,17 @@ namespace Zodiacon.ManagedWindows.Core {
 
         public static SystemInfo GetNativeSystemInfo() {
             return SystemInfo.GetNativeSystemInfo();
+        }
+
+        public static PageFileInfo[] EnumPageFiles() {
+            var pageFiles = new List<PageFileInfo>(4);
+
+            Win32.EnumPageFiles((IntPtr context, ref EnumPageFileInformation info, string filename) => {
+                pageFiles.Add(new PageFileInfo(ref info, filename));
+                return true;
+            }, IntPtr.Zero);
+
+            return pageFiles.ToArray();
         }
 
     }

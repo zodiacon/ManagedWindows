@@ -118,7 +118,140 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct PROCESS_BASIC_INFORMATION {
+    unsafe struct CLIENT_ID {
+        public IntPtr Process;
+        public IntPtr Thread;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct EXCEPTION_REGISTRATION_RECORD {
+        EXCEPTION_REGISTRATION_RECORD* Next;
+        IntPtr Handler;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    unsafe struct UNICODE_STRING {
+        public short Length;
+        public short MaximumLengh;
+        public char* Buffer;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct LIST_ENTRY {
+        public LIST_ENTRY* Next;
+        public LIST_ENTRY* Prev;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct NT_TIB {
+        EXCEPTION_REGISTRATION_RECORD* ExceptionList;
+        public IntPtr StackBase;
+        public IntPtr StackLimit;
+        public IntPtr SubSystemTib;
+        public IntPtr FiberData;
+        public IntPtr ArbitraryUserPointer;
+        NT_TIB* Self;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct NT_TIB32 {
+        uint ExceptionList;
+        public uint StackBase;
+        public uint StackLimit;
+        public uint SubSystemTib;
+        public uint FiberData;
+        public uint ArbitraryUserPointer;
+        uint Self;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct TEB32 {
+        public NT_TIB32 Tib;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct TEB64 {
+        public NT_TIB Tib;
+        public uint EnvironmentPointer;
+        public CLIENT_ID Cid;
+        public IntPtr ActiveRpcInfo;
+        public IntPtr ThreadLocalStoragePointer;
+        public IntPtr Peb;
+        public uint LastErrorValue;
+        public uint CountOfOwnedCriticalSections;
+        public IntPtr CsrClientThread;
+        public IntPtr Win32ThreadInfo;
+
+        public fixed uint Win32ClientInfo[0x1f];
+
+        public IntPtr WOW32Reserved;
+        public uint CurrentLocale;
+        public uint FpSoftwareStatusRegister;
+
+        public fixed long SystemReserved1[0x36];
+        IntPtr Spare1;
+        public uint ExceptionCode;
+
+        fixed uint SpareBytes1[0x28];
+        fixed long SystemReserved2[0xa];
+
+        public uint GdiRgn;
+        public uint GdiPen;
+        public uint GdiBrush;
+        public CLIENT_ID RealClientId;
+        IntPtr GdiCachedProcessHandle;
+        uint GdiClientPID;
+        uint GdiClientTID;
+        IntPtr GdiThreadLocaleInfo;
+        fixed long UserReserved[5];
+
+        public fixed long GlDispatchTable[0x118];
+        fixed uint GlReserved1[0x1a];
+
+        long GlReserved2;
+        public long GlSectionInfo;
+        public long GlSection;
+        public long GlTable;
+        public long GlCurrentRC;
+        public long GlContext;
+        public int LastStatusValue;
+        public UNICODE_STRING StaticUnicodeString;
+
+        public fixed char StaticUnicodeBuffer[0x105];
+        long DeallocationStack;
+        fixed long TlsSlots[0x40];
+        public LIST_ENTRY TlsLinks;
+        public IntPtr Vdm;
+        public IntPtr ReservedForNtRpc;
+
+        fixed long DbgSsReserved[2];
+        public uint HardErrorDisabled;
+
+        public fixed long Instrumentation[0x10];
+        public IntPtr WinSockData;
+        public uint GdiBatchCount;
+        uint Spare2;
+        uint Spare3;
+        uint Spare4;
+        public IntPtr ReservedForOle;
+        public uint WaitingOnLoaderLock;
+        public IntPtr StackCommit;
+        public IntPtr StackCommitMax;
+        public IntPtr StackReserved;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct THREAD_BASIC_INFORMATION {
+        public int ExitStatus;
+        public void* TebBaseAddress;
+        public CLIENT_ID ClientId;
+        public UIntPtr AffinityMask;
+        public int Priority;
+        public int BasePriority;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct PROCESS_BASIC_INFORMATION {
         public int ExitStatus;
         public IntPtr PebBaseAddress;
         public UIntPtr AffinityMask;
@@ -328,19 +461,19 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     [SuppressUnmanagedCodeSecurity]
-    public static class NtDll {
+    public static partial class NtDll {
         const string Library = "ntdll";
 
         [DllImport(Library, ExactSpelling = true)]
         public static extern int NtQuerySystemInformation(SystemInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
 
         [DllImport(Library, ExactSpelling = true)]
-        public static extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInformationClass infoClass, IntPtr buffer, int size, out uint actualSize);
+        public static extern int NtQueryInformationProcess(SafeHandle hProcess, ProcessInformationClass infoClass, IntPtr buffer, int size, out uint actualSize);
 
         [DllImport(Library, ExactSpelling = true)]
-        public static unsafe extern int NtQueryInformationProcess(IntPtr hProcess, ProcessInformationClass infoClass, void* buffer, int size, int* actualSize = null);
+        public static unsafe extern int NtQueryInformationProcess(SafeHandle hProcess, ProcessInformationClass infoClass, void* buffer, int size, int* actualSize = null);
 
         [DllImport(Library, ExactSpelling = true)]
-        public static extern int NtQueryInformationThread(IntPtr hThread, ThreadInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
+        public static extern int NtQueryInformationThread(SafeHandle hThread, ThreadInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
     }
 }

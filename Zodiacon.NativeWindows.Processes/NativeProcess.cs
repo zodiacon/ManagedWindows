@@ -1,5 +1,4 @@
-﻿using Zodiacon.ManagedWindows.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
+using Zodiacon.ManagedWindows.Core;
 
 namespace Zodiacon.ManagedWindows.Processes {
     public sealed class NativeProcess : WaitHandle, IEquatable<NativeProcess> {
@@ -80,7 +80,7 @@ namespace Zodiacon.ManagedWindows.Processes {
         bool GetProcessTimes(out long start, out long exit, out long kernel, out long user) => 
             Kernel32.GetProcessTimes(SafeWaitHandle, out start, out exit, out kernel, out user);
 
-        public DateTime StartTime {
+        public DateTime CreateTime {
             get {
                 if (SafeWaitHandle.IsInvalid)
                     throw new InvalidOperationException();
@@ -152,7 +152,7 @@ namespace Zodiacon.ManagedWindows.Processes {
             if (other == null)
                 return false;
 
-            return Id == other.Id && StartTime == other.StartTime;
+            return Id == other.Id && CreateTime == other.CreateTime;
         }
 
         public override bool Equals(object obj) {
@@ -161,23 +161,39 @@ namespace Zodiacon.ManagedWindows.Processes {
         }
 
         public override int GetHashCode() {
-            return Id ^ StartTime.GetHashCode();
+            return Id ^ CreateTime.GetHashCode();
         }
 
         public bool IsBeingDebugged => CheckRemoteDebuggerPresent(SafeWaitHandle, out var debugged) ? debugged : throw new Win32Exception(Marshal.GetLastWin32Error());
 
         public void BreakInto() {
             using (var handle = SafeWaitHandle.Duplicate((uint)ProcessAccessMask.SetInformation)) {
-                Kernel32.DebugBreakProcess(handle);
+                DebugBreakProcess(handle);
             }
         }
 
         public unsafe int ParentProcessId {
             get {
                 PROCESS_BASIC_INFORMATION info;
-                if (NtDll.NtQueryInformationProcess(SafeWaitHandle.DangerousGetHandle(), ProcessInformationClass.BasicInformation, &info, sizeof(PROCESS_BASIC_INFORMATION)) < 0)
+                if (NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.BasicInformation, &info, sizeof(PROCESS_BASIC_INFORMATION)) < 0)
                     return 0;
                 return info.ParentProcessId.ToInt32();
+            }
+        }
+
+        public long ReadMemory(IntPtr address, IntPtr buffer, long size, bool requestHandle = true) {
+            bool ok = ReadProcessMemory(SafeWaitHandle, address, buffer, new IntPtr(size), out var bytesRead);
+            if (!ok)
+                return 0;
+            return bytesRead.ToInt64();
+        }
+
+        public bool Is64Bit {
+            get {
+                if (!Environment.Is64BitOperatingSystem)
+                    return false;
+                IsWow64Process(SafeWaitHandle, out bool wow64).ThrowIfWin32Failed();
+                return !wow64;
             }
         }
     }

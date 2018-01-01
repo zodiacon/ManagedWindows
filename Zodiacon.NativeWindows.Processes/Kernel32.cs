@@ -156,6 +156,22 @@ namespace Zodiacon.ManagedWindows.Processes {
         public PageType Type;
     }
 
+    public enum IoCompletionResult {
+        Timeout = 0,
+        ApcExecuted = 0xc0
+    }
+
+    public enum NativeThreadPriority {
+        AboveNormal = 1,
+        BelowNormal = -1,
+        Highest = 2,
+        Idle = -15,
+        Lowest = -2,
+        Normal = 0,
+        TimeCritical = 15,
+        BackgroundBegin = 0x10000,
+        BackgroundEnd = 0x20000
+    }
 
     public delegate uint ThreadProc(IntPtr param);
 
@@ -170,10 +186,16 @@ namespace Zodiacon.ManagedWindows.Processes {
         public static extern int GetProcessId(SafeWaitHandle hProcess);
 
         [DllImport(Library, SetLastError = true)]
-        public static extern bool TerminateProcess(SafeWaitHandle hProcess, uint exitCode);
+        public static extern bool TerminateProcess(SafeHandle hProcess, uint exitCode);
 
         [DllImport(Library, SetLastError = true)]
-        public static extern bool GetProcessTimes(SafeWaitHandle hProcess, out long startTime, out long exitTime, out long kernelTime, out long userTime);
+        public static extern bool TerminateThread(SafeHandle hThread, uint exitCode);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool GetProcessTimes(SafeHandle hProcess, out long startTime, out long exitTime, out long kernelTime, out long userTime);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool GetThreadTimes(SafeHandle hthread, out long startTime, out long exitTime, out long kernelTime, out long userTime);
 
         [DllImport(Library, SetLastError = true)]
         public static extern bool GetExitCodeProcess(IntPtr hProcess, ref uint exitCode);
@@ -188,10 +210,13 @@ namespace Zodiacon.ManagedWindows.Processes {
         public static extern bool GetProcessIoCounters(IntPtr hProcess, out IO_COUNTERS ioCounters);
 
         [DllImport(Library, SetLastError = true)]
-        public static extern bool SetPriorityClass(SafeWaitHandle hProcess, ProcessPriorityClass priority);
+        public static extern bool SetPriorityClass(SafeHandle hProcess, ProcessPriorityClass priority);
 
         [DllImport(Library, SetLastError = true)]
-        public static extern bool IsProcessInJob(SafeWaitHandle hProcess, SafeWaitHandle hJob, out bool inJob);
+        public static extern bool IsProcessInJob(SafeHandle hProcess, SafeWaitHandle hJob, out bool inJob);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool IsWow64Process(SafeHandle hProcess, out bool wow64);
 
         [DllImport(Library, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern SafeWaitHandle CreateJobObject(JobObjectSecurity security, string name);
@@ -212,6 +237,18 @@ namespace Zodiacon.ManagedWindows.Processes {
         public static extern int GetThreadId(SafeHandle hThread);
 
         [DllImport(Library, SetLastError = true)]
+        public static extern int GetProcessIdOfThread(SafeHandle hThread);
+
+        [DllImport(Library)]
+        public static extern int GetCurrentThreadId();
+
+        [DllImport(Library)]
+        public static extern IntPtr GetCurrentThread();
+
+        [DllImport(Library)]
+        public static extern IntPtr GetCurrentProcess();
+
+        [DllImport(Library, SetLastError = true)]
         internal static extern SafeFileHandle CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags flags, int pid = 0);
 
         [DllImport(Library, SetLastError = true)]
@@ -228,6 +265,22 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library, SetLastError = true)]
         internal static extern bool DebugBreakProcess(SafeHandle hProcess);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern NativeThreadPriority GetThreadPriority(SafeHandle hThread);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern bool SetThreadPriority(SafeHandle hThread, NativeThreadPriority priority);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern bool ReadProcessMemory(SafeHandle hProcess, IntPtr address, IntPtr buffer, IntPtr size, out IntPtr bytesRead);
+
+        [DllImport(Library, SetLastError = true)]
+        internal unsafe static extern bool ReadProcessMemory(SafeHandle hProcess, void* address, void* buffer, IntPtr size, out IntPtr bytesRead);
+
+        [DllImport(Library)]
+        internal static extern IoCompletionResult SleepEx(int msec, bool alertable);
+
 
     }
 }

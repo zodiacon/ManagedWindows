@@ -47,6 +47,7 @@
     <Compile Include="HeapBlock.cs" />
     <Compile Include="ModuleInfo.cs" />
     <Compile Include="NtDll.cs" />
+    <Compile Include="PageFileInfo.cs" />
     <Compile Include="PerformanceInformation.cs" />
     <Compile Include="ProcessInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
