@@ -95,46 +95,56 @@ namespace Zodiacon.ManagedWindows.Processes {
             return Kernel32.SleepEx(msec, alertable);
         }
 
-        unsafe bool GetThreadBasicInfo(out THREAD_BASIC_INFORMATION info) {
-            using (var handle = OpenThreadHandle(ThreadAccessMask.QueryInformation)) {
-                if (handle.IsInvalid) {
-                    info = new THREAD_BASIC_INFORMATION();
-                    return false;
-                }
-                return NtDll.NtQueryInformationThread(handle, ThreadInformationClass.BasicInformation, out info, sizeof(THREAD_BASIC_INFORMATION)) >= 0;
+        unsafe bool GetThreadBasicInfo(bool useExistingHandle, out THREAD_BASIC_INFORMATION info) {
+            var handle = useExistingHandle ? SafeWaitHandle : OpenThreadHandle(ThreadAccessMask.QueryInformation);
+            if (handle.IsInvalid) {
+                info = new THREAD_BASIC_INFORMATION();
+                return false;
             }
+            bool success = NtDll.NtQueryInformationThread(handle, ThreadInformationClass.BasicInformation, out info, sizeof(THREAD_BASIC_INFORMATION)) >= 0;
+            if (!useExistingHandle)
+                handle.Dispose();
+            return success;
         }
 
-        public unsafe void GetStackLimits(out long stackBase, out long stackLimit) {
+        public unsafe void GetStackLimits(out long stackBase, out long stackLimit) => GetStackLimits(null, out stackBase, out stackLimit);
+
+        public unsafe void GetStackLimits(SafeHandle hProcess, out long stackBase, out long stackLimit) {
             stackBase = stackLimit = 0;
-            if (!GetThreadBasicInfo(out var info)) {
+            if (!GetThreadBasicInfo(true, out var info)) {
                 return;
             }
-            // read from another process address space
-            using (var process = NativeProcess.TryOpen(ProcessAccessMask.VmRead | ProcessAccessMask.QueryInformation, ProcessId)) {
-                if (process == null)
+            NativeProcess process;
+            if (hProcess != null && !hProcess.IsInvalid)
+                process = NativeProcess.FromHandle(hProcess.DangerousGetHandle(), false);
+            else
+                process = NativeProcess.TryOpen(ProcessAccessMask.VmRead | ProcessAccessMask.QueryInformation, ProcessId);
+
+            if (process == null)
+                return;
+
+            void* teb;
+            if (Environment.Is64BitProcess) {
+                teb = info.TebBaseAddress;
+                NT_TIB tib;
+                if (process.ReadMemory(new IntPtr(teb), new IntPtr(&tib), sizeof(NT_TIB), false) == 0)
                     return;
 
-                void* teb;
-                if (Environment.Is64BitProcess) {
-                    teb = info.TebBaseAddress;
-                    NT_TIB tib;
-                    if (process.ReadMemory(new IntPtr(teb), new IntPtr(&tib), sizeof(NT_TIB), false) == 0)
-                        return;
-
-                    stackBase = tib.StackBase.ToInt64();
-                    stackLimit = tib.StackLimit.ToInt64();
-                }
-                else {
-                    teb = info.TebBaseAddress;
-                    NT_TIB32 tib;
-                    if (process.ReadMemory(new IntPtr(teb), new IntPtr(&tib), sizeof(NT_TIB32), false) == 0)
-                        return;
-
-                    stackBase = tib.StackBase;
-                    stackLimit = tib.StackLimit;
-                }
+                stackBase = tib.StackBase.ToInt64();
+                stackLimit = tib.StackLimit.ToInt64();
             }
+            else {
+                teb = info.TebBaseAddress;
+                NT_TIB32 tib;
+                if (process.ReadMemory(new IntPtr(teb), new IntPtr(&tib), sizeof(NT_TIB32), false) == 0)
+                    return;
+
+                stackBase = tib.StackBase;
+                stackLimit = tib.StackLimit;
+            }
+
+            process.Dispose();
         }
     }
 }
+
