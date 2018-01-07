@@ -134,5 +134,44 @@ namespace Zodiacon.ManagedWindows.Core {
             return pageFiles.ToArray();
         }
 
+        public static IntPtr[] EnumThreadWindows(int threadId) {
+            var windows = new List<IntPtr>(64);
+
+            Win32.EnumThreadWindows(threadId, (hWnd, param) => {
+                windows.Add(hWnd);
+                return true;
+            }, IntPtr.Zero).ThrowIfWin32Failed();
+
+            return windows.ToArray();
+        }
+
+        public static string[] EnumWindowStations() {
+            var winStations = new List<string>(4);
+            Win32.EnumWindowStations((name, param) => {
+                winStations.Add(name);
+                return true;
+            }, IntPtr.Zero).ThrowIfWin32Failed();
+
+            return winStations.ToArray();
+        }
+
+        public unsafe static Session[] EnumSessions() {
+            var sessions = new List<Session>(4);
+            int level = 1;
+            Win32.WTSEnumerateSessionsEx(IntPtr.Zero, ref level, 0, out var info, out int count).ThrowIfWin32Failed();
+            for (int i = 0; i < count; i++) {
+                var session = new Session {
+                    Id = info[i].SessionId,
+                    State = info[i].State,
+                    Name = new string(info[i].pSessionName),
+                    UserName = new string(info[i].pUserName)
+                };
+                sessions.Add(session);
+            }
+
+            Win32.WTSFreeMemoryEx(WtsTypeClass.SessionInfoLevel1, info, count);
+
+            return sessions.ToArray();
+        }
     }
 }

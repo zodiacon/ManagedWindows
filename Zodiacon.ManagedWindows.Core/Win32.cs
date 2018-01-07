@@ -198,6 +198,39 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     delegate bool PageFileEnumProc(IntPtr context, ref EnumPageFileInformation info, [MarshalAs(UnmanagedType.LPTStr)] string fileName);
+    delegate bool EnumWindowStationsProc([MarshalAs(UnmanagedType.LPWStr)] string windowStationName, IntPtr param);
+    delegate bool EnumThreadWndowsProc(IntPtr hWnd, IntPtr param);
+
+    public enum SessionConnectionState {
+        Active,
+        Connected,
+        ConnectQuery,
+        Shadow,
+        Disconnected,
+        Idle,
+        Listen,
+        Reset,
+        Down,
+        Init
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    unsafe struct SessionInfo1 {
+        uint ExecEnvId;
+        public SessionConnectionState State;
+        public int SessionId;
+        public char* pSessionName;
+        public char* pHostName;
+        public char* pUserName;
+        public char* pDomainName;
+        public char* pFarmName;
+    }
+
+    enum WtsTypeClass {
+        ProcessInfoLevel0,
+        ProcessInfoLevel1,
+        SessionInfoLevel1
+    }
 
     [SuppressUnmanagedCodeSecurity]
     static class Win32 {
@@ -268,6 +301,18 @@ namespace Zodiacon.ManagedWindows.Core {
 
         [DllImport("psapi", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern bool EnumPageFiles(PageFileEnumProc proc, IntPtr context);
+
+        [DllImport("user32", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern bool EnumWindowStations(EnumWindowStationsProc proc, IntPtr param);
+
+        [DllImport("user32", SetLastError = true)]
+        internal static extern bool EnumThreadWindows(int threadId, EnumThreadWndowsProc proc, IntPtr param);
+
+        [DllImport("wtsapi32", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static unsafe extern bool WTSEnumerateSessionsEx(IntPtr hServer, ref int level, int filter, out SessionInfo1* info, out int count);
+
+        [DllImport("wtsapi32", SetLastError = true)]
+        internal unsafe static extern bool WTSFreeMemoryEx(WtsTypeClass type, void* memory, int count);
 
     }
 }

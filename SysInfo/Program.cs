@@ -34,6 +34,16 @@ namespace SysInfo {
             foreach (var pf in SystemInformation.EnumPageFiles()) {
                 Console.WriteLine($"Size: {pf.TotalSize >> 20} MB, In use: {pf.TotalInUse >> 20} MB, Peek: {pf.PeakUsage >> 20} MB, Filename: {pf.FileName}");
             }
+
+            Console.WriteLine("Window Stations:");
+            foreach (var ws in SystemInformation.EnumWindowStations()) {
+                Console.WriteLine($"\t{ws}");
+            }
+
+            Console.WriteLine("Sessions:");
+            foreach (var session in SystemInformation.EnumSessions()) {
+                Console.WriteLine($"\tSession: {session.Id}, State:{session.State}, Name: {session.Name}, Username: {session.UserName}");
+            }
         }
     }
 }
