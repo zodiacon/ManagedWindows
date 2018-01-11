@@ -105,5 +105,25 @@ namespace Zodiacon.ManagedWindows.Windows {
             }
             set => User32.SetWindowText(_handle, value).ThrowIfWin32Failed();
         }
+
+        public WindowStyle Style {
+            get => (WindowStyle)(User32.GetWindowLongPtr(_handle, GetWindowLongIndex.Style).ToUInt32() & 0xffff0000);
+            set => User32.SetWindowLongPtr(_handle, GetWindowLongIndex.Style, new UIntPtr((uint)value));
+        }
+
+        public ExtendedWindowStyle ExtendedStyle {
+            get => (ExtendedWindowStyle)User32.GetWindowLongPtr(_handle, GetWindowLongIndex.ExtendedStyle).ToUInt32();
+            set => User32.SetWindowLongPtr(_handle, GetWindowLongIndex.ExtendedStyle, new UIntPtr((uint)value));
+        }
+
+        public int ID {
+            get => (int)User32.GetWindowLongPtr(_handle, GetWindowLongIndex.ID).ToUInt32();
+            set => User32.SetWindowLongPtr(_handle, GetWindowLongIndex.ID, new UIntPtr((uint)value));
+        }
+
+        public void Show(ShowWindowType type = ShowWindowType.Show) => User32.ShowWindow(_handle, type).ThrowIfWin32Failed();
+
+        public void ShowAsync(ShowWindowType type = ShowWindowType.Show) => User32.ShowWindowAsync(_handle, type).ThrowIfWin32Failed();
+        public bool Flash(bool invert) => User32.FlashWindow(_handle, invert);
     }
 }

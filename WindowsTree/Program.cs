@@ -8,13 +8,13 @@ using Zodiacon.ManagedWindows.Windows;
 namespace WindowsTree {
     class Program {
         static void Main(string[] args) {
-            EnumWindows(null, 0);
+            EnumWindows(null, -2);
         }
 
         static void EnumWindows(NativeWindow root, int indent) {
             if (root != null) {
                 Console.Write(new string(' ', indent));
-                Console.WriteLine($"H: {root.Handle}  Visible: {root.IsVisible} thread: {root.ThreadId} Text: {root.Text}");
+                Console.WriteLine($"H: {root.Handle}  Visible: {root.IsVisible} thread: {root.ThreadId} Style: [{root.Style}] ExStyle: [{root.ExtendedStyle}] Text: {root.Text}");
             }
             if (root == null) {
                 var windows = NativeWindow.EnumWindows();

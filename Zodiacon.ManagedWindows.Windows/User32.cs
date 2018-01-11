@@ -21,6 +21,84 @@ namespace Zodiacon.ManagedWindows.Windows {
         WriteAttributes = 0x10,
     }
 
+    [Flags]
+    public enum WindowStyle : uint {
+        Border = 0x800000,
+        Caption = 0xc00000,
+        Child = 0x40000000,
+        ClipChildren = 0x2000000,
+        ClipSiblings = 0x4000000,
+        Disabled = 0x8000000,
+        DialogFrame = 0x400000,
+        Group = 0x20000,
+        HScroll = 0x100000,
+        Maximize = 0x1000000,
+        MaximizeBox = 0x10000,
+        Minimize = 0x20000000,
+        MinimizeBox = 0x20000,
+        Overlapped = 0,
+        Popup = 0x80000000U,
+        SizeBox = 0x40000,
+        SysMenu = 0x80000,
+        TabStop = 0x10000,
+        Visible = 0x10000000,
+        VScroll = 0x200000,
+        PopupWindow = Popup | Border | SysMenu
+    }
+
+    [Flags]
+    public enum ExtendedWindowStyle : uint {
+        None = 0,
+        AcceptFiles = 0x10,
+        AppWindow = 0x40000,
+        ClientEdge = 0x200,
+        Composited = 0x2000000,
+        ContextHelp = 0x400,
+        ControlParent = 0x10000,
+        DialogModalFrame = 1,
+        Layered = 0x80000,
+        LayoutRTL = 0x400000,
+        LeftScrollBar = 0x4000,
+        MDIChild = 0x40,
+        NoActivate = 0x8000000,
+        NoInheritLayout = 0x100000,
+        NoParentNotify = 4,
+        NoRedirectionBitmap = 0x200000,
+        WindowEdge = 0x100,
+        Transparent = 0x20,
+        Topmost = 8,
+        ToolWindow = 0x80,
+        StaticEdge = 0x20000,
+        RTLReading = 0x2000,
+        PalleteWindow = WindowEdge | ToolWindow | Topmost,
+        OverlappedWindow = WindowEdge | ClientEdge
+    }
+
+    public enum ShowWindowType : int {
+        ForceMinimize = 11,
+        Hide = 0,
+        Maximize = 3,
+        Minimize = 6,
+        Restore = 9,
+        Show = 5,
+        ShowDefault = 10,
+        ShowMaximized = 3,
+        ShowMinimized = 2,
+        ShowMinimizedNoActivate = 7,
+        ShowNoActivate = 4,
+        ShowNormal = 1
+    }
+
+    enum GetWindowLongIndex {
+        ExtendedStyle = -20,
+        hInstance = -6,
+        hWndParent = -8,
+        ID = -12,
+        Style = -16,
+        UserData = -21,
+        WindowProc = -4,
+    }
+
     delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr param);
 
     [SuppressUnmanagedCodeSecurity]
@@ -92,6 +170,21 @@ namespace Zodiacon.ManagedWindows.Windows {
 
         [DllImport(Library, SetLastError = true)]
         public static extern bool EnumChildWindows(IntPtr hWnd, EnumWindowsProc proc, IntPtr param);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern UIntPtr GetWindowLongPtr(IntPtr hWnd, GetWindowLongIndex index);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern UIntPtr SetWindowLongPtr(IntPtr hWnd, GetWindowLongIndex index, UIntPtr value);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool ShowWindow(IntPtr hWnd, ShowWindowType type);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool ShowWindowAsync(IntPtr hWnd, ShowWindowType type);
+
+        [DllImport(Library)]
+        public static extern bool FlashWindow(IntPtr hWnd, bool invert);
 
     }
 }
