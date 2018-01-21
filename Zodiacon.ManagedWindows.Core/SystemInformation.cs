@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -172,6 +173,30 @@ namespace Zodiacon.ManagedWindows.Core {
             Win32.WTSFreeMemoryEx(WtsTypeClass.SessionInfoLevel1, info, count);
 
             return sessions.ToArray();
+        }
+
+        public static unsafe SystemHandleInfo[] EnumHandles() {
+            IntPtr buffer = IntPtr.Zero;
+            try {
+                var size = 1 << 23;
+                buffer = Marshal.AllocHGlobal(size);
+                int actualSize;
+                if (NtDll.NtQuerySystemInformation(SystemInformationClass.ExtendedHandleInformation, buffer, size, &actualSize) < 0)
+                    return null;
+
+                var info = (SYSTEM_HANDLE_INFORMATION_EX*)buffer.ToPointer();
+                var count = info->HandleCount.ToInt32();
+                Debug.Assert(count > 0);
+                var handleInfo = (SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX*)((byte*)info + sizeof(SYSTEM_HANDLE_INFORMATION_EX));
+                var handles = new SystemHandleInfo[count];
+                for (uint i = 0; i < count; i++)
+                    handles[i] = new SystemHandleInfo(&handleInfo[i]);
+                return handles;
+            }
+            finally {
+                if(buffer != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buffer);
+            }
         }
     }
 }

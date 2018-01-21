@@ -196,5 +196,28 @@ namespace Zodiacon.ManagedWindows.Processes {
                 return !wow64;
             }
         }
+
+        public unsafe HandleInfo[] EnumHandles() {
+            var size = 1 << 18; // should be enough ??
+            var buffer = Marshal.AllocHGlobal(size);
+            try {
+                int actualSize;
+                var status = NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.HandleInformation, buffer.ToPointer(), size, &actualSize);
+                if (status < 0)
+                    throw new Win32Exception(status, "Failed to get handle list");
+
+                var info = (PROCESS_HANDLE_SNAPSHOT_INFORMATION*)buffer.ToPointer();
+                var count = info->NumberOfHandles.ToUInt32();
+                var handles = (PROCESS_HANDLE_TABLE_ENTRY_INFO*)((byte*)info + sizeof(PROCESS_HANDLE_SNAPSHOT_INFORMATION));
+                var result = new HandleInfo[count];
+                for (uint i = 0; i < count; ++i) {
+                    result[i] = new HandleInfo(&handles[i]);
+                }
+                return result;
+            }
+            finally {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
     }
 }
