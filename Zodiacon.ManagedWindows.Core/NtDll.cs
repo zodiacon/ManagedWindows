@@ -93,6 +93,21 @@ namespace Zodiacon.ManagedWindows.Core {
         CheckStackExtentsMode = 59,
         CommandLineInformation = 60,
         ProtectionInformation = 61,
+        MemoryExhaustion = 62,
+        FaultInformation = 63,
+        TelemetryIdInformation = 64,
+        CommitReleaseInformation = 65,
+        DefaultCpuSetsInformation = 66,
+        AllowedCpuSetsInformation = 67,
+        Reserved1Information = 66,
+        Reserved2Information = 67,
+        SubsystemProcess = 68,
+        JobMemoryInformation = 69,
+        InPrivate = 70,
+        RaiseUMExceptionOnInvalidHandleClose = 71,
+        IumChallengeResponse = 72,
+        ChildProcessInformation = 73,
+        MaxProcessInfoClass
     }
 
     public enum ThreadInformationClass : uint {
@@ -337,7 +352,13 @@ namespace Zodiacon.ManagedWindows.Core {
         ProcessorIdleMaskInformation = 193,
         SecureDumpEncryptionInformation = 194,
         WriteConstraintInformation = 195,
-        MaxSystemInfoClass = 196,
+        KernelVaShadowInformation = 196,
+        HypervisorSharedPagedInformation = 197,
+        FirmwareBootPerformanceInformation = 198,
+        CodeIntegrityVerificationInformation = 199,
+        FirmwarePartitionInformation = 200,
+        SystemSpeculationControlInformation = 201,
+        MaxSystemInfoClass
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -352,8 +373,15 @@ namespace Zodiacon.ManagedWindows.Core {
         IntPtr Handler;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     unsafe struct UNICODE_STRING {
+        public short Length;
+        public short MaximumLengh;
+        public char* Buffer;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    unsafe struct UNICODE_STRING32 {
         public short Length;
         public short MaximumLengh;
         public char* Buffer;
@@ -461,6 +489,170 @@ namespace Zodiacon.ManagedWindows.Core {
         public IntPtr StackCommit;
         public IntPtr StackCommitMax;
         public IntPtr StackReserved;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    struct SYSTEM_PROCESS_INFORMATION64 {
+        [FieldOffset(0)] public uint NextEntryOffset;
+        [FieldOffset(4)] public uint NumberOfThreads;
+        [FieldOffset(8)]public long WorkingSetPrivateSize;
+        [FieldOffset(0x10)]public uint HardFaultCount;
+        [FieldOffset(0x14)]public uint NumberOfThreadsHighWatermark;
+        [FieldOffset(0x18)]public ulong CycleTime;
+        [FieldOffset(0x20)]public long CreateTime;
+        [FieldOffset(0x28)]public long UserTime;
+        [FieldOffset(0x30)]public long KernelTime;
+        [FieldOffset(0x38)] public UNICODE_STRING ImageName;
+        [FieldOffset(0x48)] public int BasePriority;
+        [FieldOffset(0x50)] public IntPtr UniqueProcessId;
+        [FieldOffset(0x58)] public IntPtr InheritedFromUniqueProcessId;
+        [FieldOffset(0x60)] public int HandleCount;
+        [FieldOffset(0x64)] public int SessionId;
+        [FieldOffset(0x68)] public UIntPtr UniqueProcessKey;
+        [FieldOffset(0x70)] public long PeakVirtualSize;
+        [FieldOffset(0x78)] public long VirtualSize;
+        [FieldOffset(0x80)] public uint PageFaultCount;
+        [FieldOffset(0x88)] public long PeakWorkingSetSize;
+        [FieldOffset(0x90)] public long WorkingSetSize;
+        [FieldOffset(0x98)] public long QuotaPeakPagedPoolUsage;
+        [FieldOffset(0xa0)] public long QuotaPagedPoolUsage;
+        [FieldOffset(0xa8)] public long QuotaPeakNonPagedPoolUsage;
+        [FieldOffset(0xb0)] public long QuotaNonPagedPoolUsage;
+        [FieldOffset(0xb8)] public long PagefileUsage;
+        [FieldOffset(0xc0)] public long PeakPagefileUsage;
+        [FieldOffset(0xc8)] public long PrivatePageCount;
+        [FieldOffset(0xd0)] public long ReadOperationCount;
+        [FieldOffset(0xd8)] public long WriteOperationCount;
+        [FieldOffset(0xe0)] public long OtherOperationCount;
+        [FieldOffset(0xe8)] public long ReadTransferCount;
+        [FieldOffset(0xf0)] public long WriteTransferCount;
+        [FieldOffset(0xf8)] public long OtherTransferCount;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    struct SYSTEM_PROCESS_INFORMATION32 {
+        [FieldOffset(0)] public uint NextEntryOffset;
+        [FieldOffset(4)] public uint NumberOfThreads;
+        [FieldOffset(8)] public long WorkingSetPrivateSize;
+        [FieldOffset(0x10)] public uint HardFaultCount;
+        [FieldOffset(0x14)] public uint NumberOfThreadsHighWatermark;
+        [FieldOffset(0x18)] public ulong CycleTime;
+        [FieldOffset(0x20)] public long CreateTime;
+        [FieldOffset(0x28)] public long UserTime;
+        [FieldOffset(0x30)] public long KernelTime;
+        [FieldOffset(0x38)] public UNICODE_STRING32 ImageName;
+        [FieldOffset(0x40)] public int BasePriority;
+        [FieldOffset(0x44)] public IntPtr UniqueProcessId;
+        [FieldOffset(0x48)] public IntPtr InheritedFromUniqueProcessId;
+        [FieldOffset(0x4c)] public int HandleCount;
+        [FieldOffset(0x50)] public int SessionId;
+        [FieldOffset(0x54)] public UIntPtr UniqueProcessKey;
+        [FieldOffset(0x58)] public long PeakVirtualSize;
+        [FieldOffset(0x5c)] public long VirtualSize;
+        [FieldOffset(0x60)] public uint PageFaultCount;
+        [FieldOffset(0x64)] public uint PeakWorkingSetSize;
+        [FieldOffset(0x68)] public uint WorkingSetSize;
+        [FieldOffset(0x6c)] public uint QuotaPeakPagedPoolUsage;
+        [FieldOffset(0x70)] public uint QuotaPagedPoolUsage;
+        [FieldOffset(0x74)] public uint QuotaPeakNonPagedPoolUsage;
+        [FieldOffset(0x78)] public uint QuotaNonPagedPoolUsage;
+        [FieldOffset(0x7c)] public uint PagefileUsage;
+        [FieldOffset(0x80)] public uint PeakPagefileUsage;
+        [FieldOffset(0x84)] public uint PrivatePageCount;
+        [FieldOffset(0x88)] public long ReadOperationCount;
+        [FieldOffset(0x90)] public long WriteOperationCount;
+        [FieldOffset(0x98)] public long OtherOperationCount;
+        [FieldOffset(0xa0)] public long ReadTransferCount;
+        [FieldOffset(0xa8)] public long WriteTransferCount;
+        [FieldOffset(0xb0)] public long OtherTransferCount;
+    }
+
+    public enum ThreadState {
+        Initialized = 0,
+        Ready = 1,
+        Running = 2,
+        Standby = 3,
+        Terminated = 4,
+        Waiting = 5,
+        Transition = 6,
+        DeferredReady = 7,
+        GateWaitObsolete = 8,
+        WaitingForProcessInSwap = 9
+    }
+
+    public enum WaitReason {
+        Executive = 0,
+        FreePage = 1,
+        PageIn = 2,
+        PoolAllocation = 3,
+        DelayExecution = 4,
+        Suspended = 5,
+        UserRequest = 6,
+        WrExecutive = 7,
+        WrFreePage = 8,
+        WrPageIn = 9,
+        WrPoolAllocation = 10,
+        WrDelayExecution = 11,
+        WrSuspended = 12,
+        WrUserRequest = 13,
+        WrSpare0 = 14,
+        WrQueue = 15,
+        WrLpcReceive = 16,
+        WrLpcReply = 17,
+        WrVirtualMemory = 18,
+        WrPageOut = 19,
+        WrRendezvous = 20,
+        WrKeyedEvent = 21,
+        WrTerminated = 22,
+        WrProcessInSwap = 23,
+        WrCpuRateControl = 24,
+        WrCalloutStack = 25,
+        WrKernel = 26,
+        WrResource = 27,
+        WrPushLock = 28,
+        WrMutex = 29,
+        WrQuantumEnd = 30,
+        WrDispatchInt = 31,
+        WrPreempted = 32,
+        WrYieldExecution = 33,
+        WrFastMutex = 34,
+        WrGuardedMutex = 35,
+        WrRundown = 36,
+        WrAlertByThreadId = 37,
+        WrDeferredPreempt = 38,
+        WrPhysicalFault = 39,
+        MaximumWaitReason
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct SYSTEM_THREAD_INFORMATION64 {
+        public long KernelTime;
+        public long UserTime;
+        public long CreateTime;
+        public uint WaitTime;
+        uint dummy1;
+        public IntPtr StartAddress;
+        public CLIENT_ID ClinetId;
+        public int Priority;
+        public int BasePriority;
+        public uint ContextSwitches;
+        public ThreadState ThreadState;
+        public WaitReason WaitReason;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct SYSTEM_THREAD_INFORMATION32 {
+        public long KernelTime;
+        public long UserTime;
+        public long CreateTime;
+        public uint WaitTime;
+        public IntPtr StartAddress;
+        public CLIENT_ID ClinetId;
+        public int Priority;
+        public int BasePriority;
+        public uint ContextSwitches;
+        public ThreadState ThreadState;
+        public WaitReason WaitReason;
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -38,45 +38,22 @@ namespace Zodiacon.ManagedWindows.Processes {
         public int Id => Kernel32.GetThreadId(SafeWaitHandle);
         public int ProcessId => Kernel32.GetProcessIdOfThread(SafeWaitHandle);
 
-        bool GetThreadTimes(out long start, out long exit, out long kernel, out long user) =>
-            Kernel32.GetThreadTimes(SafeWaitHandle, out start, out exit, out kernel, out user);
+        bool GetThreadTimes(out long start, out long exit, out long kernel, out long user) {
+            if (SafeWaitHandle.IsInvalid)
+                throw new InvalidOperationException();
 
-        public DateTime CreateTime {
-            get {
-                if (SafeWaitHandle.IsInvalid)
-                    throw new InvalidOperationException();
-                GetThreadTimes(out long start, out long d, out d, out d);
-                return new DateTime(start);
-            }
+            return Kernel32.GetThreadTimes(SafeWaitHandle, out start, out exit, out kernel, out user);
         }
 
-        public DateTime ExitTime {
-            get {
-                GetThreadTimes(out long d, out long end, out d, out d);
-                return new DateTime(end);
-            }
-        }
+        public DateTime? CreateTime => GetThreadTimes(out long start, out long d, out d, out d) ? new DateTime(start) : default(DateTime?);
 
-        public TimeSpan KernelTime {
-            get {
-                GetThreadTimes(out long d, out d, out long kernel, out d);
-                return new TimeSpan(kernel);
-            }
-        }
+        public DateTime? ExitTime => GetThreadTimes(out long d, out long end, out d, out d) ? new DateTime(end) : default(DateTime?);
 
-        public TimeSpan UserTime {
-            get {
-                GetThreadTimes(out long d, out d, out d, out long user);
-                return new TimeSpan(user);
-            }
-        }
+        public TimeSpan? KernelTime => GetThreadTimes(out long d, out d, out long kernel, out d) ? new TimeSpan(kernel) : default(TimeSpan?);
 
-        public TimeSpan TotalTime {
-            get {
-                GetThreadTimes(out long d, out d, out long kernel, out long user);
-                return new TimeSpan(user + kernel);
-            }
-        }
+        public TimeSpan? UserTime => GetThreadTimes(out long d, out d, out d, out long user) ? new TimeSpan(user) : default(TimeSpan?);
+
+        public TimeSpan? TotalTime => GetThreadTimes(out long d, out d, out long kernel, out long user) ? new TimeSpan(user + kernel) : default(TimeSpan?);
 
         private SafeWaitHandle OpenThreadHandle(ThreadAccessMask accessMask) => Kernel32.OpenThread(accessMask, false, Id);
 
@@ -145,6 +122,7 @@ namespace Zodiacon.ManagedWindows.Processes {
 
             process.Dispose();
         }
+
     }
 }
 

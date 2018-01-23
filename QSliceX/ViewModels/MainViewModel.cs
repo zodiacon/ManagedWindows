@@ -111,7 +111,7 @@ namespace QSliceX.ViewModels {
                     }).
                 ToDictionary(pr => pr.id, pr => new ProcessViewModel {
                     Name = pr.Name,
-                    TotalTime = pr.TotalTime,
+                    TotalTime = (TimeSpan)pr.TotalTime,
                     Id = pr.id
                 });
         }

@@ -77,15 +77,14 @@ namespace Zodiacon.ManagedWindows.Processes {
         public bool IsRunning => !WaitOne(0);
         public bool IsTerminated => !IsRunning;
 
-        bool GetProcessTimes(out long start, out long exit, out long kernel, out long user) => 
+        bool GetProcessTimes(out long start, out long exit, out long kernel, out long user) =>
             Kernel32.GetProcessTimes(SafeWaitHandle, out start, out exit, out kernel, out user);
 
-        public DateTime CreateTime {
+        public DateTime? CreateTime {
             get {
                 if (SafeWaitHandle.IsInvalid)
                     throw new InvalidOperationException();
-                GetProcessTimes(out long start, out long d, out d, out d);
-                return new DateTime(start);
+                return GetProcessTimes(out long start, out long d, out d, out d) ? new DateTime(start) : default(DateTime?);
             }
         }
 
@@ -96,26 +95,11 @@ namespace Zodiacon.ManagedWindows.Processes {
             }
         }
 
-        public TimeSpan KernelTime {
-            get {
-                GetProcessTimes(out long d, out d, out long kernel, out d);
-                return new TimeSpan(kernel);
-            }
-        }
+        public TimeSpan? KernelTime => GetProcessTimes(out long d, out d, out long kernel, out d) ? new TimeSpan(kernel) : default(TimeSpan?);
 
-        public TimeSpan UserTime {
-            get {
-                GetProcessTimes(out long d, out d, out d, out long user);
-                return new TimeSpan(user);
-            }
-        }
+        public TimeSpan? UserTime => GetProcessTimes(out long d, out d, out d, out long user) ? new TimeSpan(user) : default(TimeSpan?);
 
-        public TimeSpan TotalTime {
-            get {
-                GetProcessTimes(out long d, out d, out long kernel, out long user);
-                return new TimeSpan(user + kernel);
-            }
-        }
+        public TimeSpan? TotalTime => GetProcessTimes(out long d, out d, out long kernel, out long user) ? new TimeSpan(user + kernel) : default(TimeSpan?);
 
         public void Terminate(uint exitCode = 0) {
             using (var handle = OpenProcessHandle(ProcessAccessMask.Terminate)) {
@@ -144,7 +128,7 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         public bool IsImmersive => IsImmersiveProcess(SafeWaitHandle);
 
-        public ProcessMemoryCounters GetMemoryCounters() => 
+        public ProcessMemoryCounters GetMemoryCounters() =>
             GetProcessMemoryInfo(SafeWaitHandle, out var counters, Marshal.SizeOf<ProcessMemoryCounters>())
                 ? counters : throw new Win32Exception(Marshal.GetLastWin32Error());
 

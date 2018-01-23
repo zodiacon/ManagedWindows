@@ -49,7 +49,7 @@ namespace Zodiacon.ManagedWindows.Core {
                 do {
                     if (pid >= 0 && te.ProcessId != pid)
                         continue;
-                    if(te.ThreadId != 0)
+                    if (te.ThreadId != 0)
                         threads.Add(new ThreadInfo(te));
                 } while (Win32.Thread32Next(handle, ref te));
 
@@ -194,7 +194,40 @@ namespace Zodiacon.ManagedWindows.Core {
                 return handles;
             }
             finally {
-                if(buffer != IntPtr.Zero)
+                if (buffer != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buffer);
+            }
+        }
+
+        public unsafe static IReadOnlyList<ProcessExtendedInformation> EnumProcessesAndThreads() {
+            var size = 1 << 18;
+            IntPtr buffer = IntPtr.Zero;
+            try {
+                do {
+                    buffer = Marshal.AllocHGlobal(size);
+                    int status = NtDll.NtQuerySystemInformation(SystemInformationClass.ProcessInformation, buffer, size);
+                    if (status == unchecked((int)0xc0000004)) {  // buffer too small
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size *= 2));
+                        continue;
+                    }
+                    if (status < 0) {
+                        return null;
+                    }
+                    break;
+                } while (true);
+
+                var list = new List<ProcessExtendedInformation>(256);
+                var process = (SYSTEM_PROCESS_INFORMATION64*)buffer.ToPointer();
+                do {
+                    list.Add(new ProcessExtendedInformation(process));
+                    if (process->NextEntryOffset == 0)
+                        break;
+                    process = (SYSTEM_PROCESS_INFORMATION64*)((byte*)process + process->NextEntryOffset);
+                } while (true);
+                return list;
+            }
+            finally {
+                if (buffer != IntPtr.Zero)
                     Marshal.FreeHGlobal(buffer);
             }
         }
