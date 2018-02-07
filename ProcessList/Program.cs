@@ -15,7 +15,7 @@ namespace ProcessList {
                 if (pi.Id > 0) {
                     using (var process = NativeProcess.TryOpen(ProcessAccessMask.QueryLimitedInformation, pi.Id)) {
                         if (process != null) {
-                            Console.Write($" Start: {process.CreateTime} Managed: {process.IsManaged} Protection: {process.Protection} Command Line: {process.CommandLine} ");
+                            Console.Write($" Start: {process.CreateTime} Managed: {process.IsManaged} In Job: {process.IsInAnyJob} Protection: {process.Protection} Command Line: {process.CommandLine} ");
                         }
                     }
                 }

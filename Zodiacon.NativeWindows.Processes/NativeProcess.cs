@@ -122,7 +122,7 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         public bool IsManaged => EnumModules()?.FirstOrDefault(module => module.Name.Equals("mscoree.dll", StringComparison.InvariantCultureIgnoreCase)) != null;
 
-        public bool IsInAnyJob => IsProcessInJob(SafeWaitHandle, null, out var injob) && injob;
+        public bool IsInAnyJob => IsProcessInJob(SafeWaitHandle, IntPtr.Zero, out var injob) && injob;
 
         public unsafe ProtectionLevel Protection {
             get {
@@ -132,7 +132,7 @@ namespace Zodiacon.ManagedWindows.Processes {
             }
         }
 
-        public bool IsProtected => Protection == ProtectionLevel.None;
+        public bool IsProtected => Protection != ProtectionLevel.None;
 
         public ModuleInfo[] EnumModules() {
             return SystemInformation.EnumModules(Id);

@@ -248,6 +248,9 @@ namespace Zodiacon.ManagedWindows.Processes {
         public static extern bool IsProcessInJob(SafeHandle hProcess, SafeWaitHandle hJob, out bool inJob);
 
         [DllImport(Library, SetLastError = true)]
+        public static extern bool IsProcessInJob(SafeHandle hProcess, IntPtr hJob, out bool inJob);
+
+        [DllImport(Library, SetLastError = true)]
         public static extern bool IsWow64Process(SafeHandle hProcess, out bool wow64);
 
         [DllImport(Library, SetLastError = true)]
@@ -276,9 +279,6 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library, SetLastError = true)]
         public static extern int GetThreadId(SafeHandle hThread);
-
-        [DllImport(Library, SetLastError = true)]
-        public static extern bool IsProcessInJob(SafeHandle hProcess, SafeHandle hJob, out bool inJob);
 
         [DllImport(Library, SetLastError = true)]
         public static extern int GetProcessIdOfThread(SafeHandle hThread);
