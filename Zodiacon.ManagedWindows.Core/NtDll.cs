@@ -495,13 +495,13 @@ namespace Zodiacon.ManagedWindows.Core {
     struct SYSTEM_PROCESS_INFORMATION64 {
         [FieldOffset(0)] public uint NextEntryOffset;
         [FieldOffset(4)] public uint NumberOfThreads;
-        [FieldOffset(8)]public long WorkingSetPrivateSize;
-        [FieldOffset(0x10)]public uint HardFaultCount;
-        [FieldOffset(0x14)]public uint NumberOfThreadsHighWatermark;
-        [FieldOffset(0x18)]public ulong CycleTime;
-        [FieldOffset(0x20)]public long CreateTime;
-        [FieldOffset(0x28)]public long UserTime;
-        [FieldOffset(0x30)]public long KernelTime;
+        [FieldOffset(8)] public long WorkingSetPrivateSize;
+        [FieldOffset(0x10)] public uint HardFaultCount;
+        [FieldOffset(0x14)] public uint NumberOfThreadsHighWatermark;
+        [FieldOffset(0x18)] public ulong CycleTime;
+        [FieldOffset(0x20)] public long CreateTime;
+        [FieldOffset(0x28)] public long UserTime;
+        [FieldOffset(0x30)] public long KernelTime;
         [FieldOffset(0x38)] public UNICODE_STRING ImageName;
         [FieldOffset(0x48)] public int BasePriority;
         [FieldOffset(0x50)] public IntPtr UniqueProcessId;
@@ -566,6 +566,7 @@ namespace Zodiacon.ManagedWindows.Core {
         [FieldOffset(0xa8)] public long WriteTransferCount;
         [FieldOffset(0xb0)] public long OtherTransferCount;
     }
+
 
     public enum ThreadState {
         Initialized = 0,
@@ -691,10 +692,6 @@ namespace Zodiacon.ManagedWindows.Core {
         IntPtr Size;
         public PROCESS_BASIC_INFORMATION BasicInfo;
         public ProcessExtendedInformationFlags Flags;
-
-        internal void Init() {
-            Size = new IntPtr(Marshal.SizeOf<PROCESS_EXTENDED_BASIC_INFORMATION>());
-        }
     }
 
     public enum ProcessProtectedType {
@@ -749,9 +746,115 @@ namespace Zodiacon.ManagedWindows.Core {
         uint Reserved;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct RTL_PROCESS_MODULE_INFORMATION {
+        IntPtr Section; 
+        public IntPtr MappedBase;
+        public IntPtr ImageBase;
+        public uint ImageSize;
+        public uint Flags;
+        public ushort LoadOrderIndex;
+        public ushort InitOrderIndex;
+        public ushort LoadCount;
+        public ushort OffsetToFileName;
+        public fixed byte FullPathName[256];
+    }
+
+    struct RTL_PROCESS_MODULE_INFORMATION_EX {
+        public ushort NextOffset;
+        public RTL_PROCESS_MODULE_INFORMATION BaseInfo;
+        public uint ImageChecksum;
+        public uint TimeDateStamp;
+        public IntPtr DefaultBase;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct SYSTEM_PERFORMANCE_INFORMATION {
+        public long IdleProcessTime;
+        public long IoReadTransferCount;
+        public long IoWriteTransferCount;
+        public long IoOtherTransferCount;
+        public uint IoReadOperationCount;
+        public uint IoWriteOperationCount;
+        public uint IoOtherOperationCount;
+        public uint AvailablePages;
+        public uint CommittedPages;
+        public uint CommitLimit;
+        public uint PeakCommitment;
+        public uint PageFaultCount;
+        public uint CopyOnWriteCount;
+        public uint TransitionCount;
+        public uint CacheTransitionCount;
+        public uint DemandZeroCount;
+        public uint PageReadCount;
+        public uint PageReadIoCount;
+        public uint CacheReadCount;
+        public uint CacheIoCount;
+        public uint DirtyPagesWriteCount;
+        public uint DirtyWriteIoCount;
+        public uint MappedPagesWriteCount;
+        public uint MappedWriteIoCount;
+        public uint PagedPoolPages;
+        public uint NonPagedPoolPages;
+        public uint PagedPoolAllocs;
+        public uint PagedPoolFrees;
+        public uint NonPagedPoolAllocs;
+        public uint NonPagedPoolFrees;
+        public uint FreeSystemPtes;
+        public uint ResidentSystemCodePage;
+        public uint TotalSystemDriverPages;
+        public uint TotalSystemCodePages;
+        public uint NonPagedPoolLookasideHits;
+        public uint PagedPoolLookasideHits;
+        public uint AvailablePagedPoolPages;
+        public uint ResidentSystemCachePage;
+        public uint ResidentPagedPoolPage;
+        public uint ResidentSystemDriverPage;
+        public uint CcFastReadNoWait;
+        public uint CcFastReadWait;
+        public uint CcFastReadResourceMiss;
+        public uint CcFastReadNotPossible;
+        public uint CcFastMdlReadNoWait;
+        public uint CcFastMdlReadWait;
+        public uint CcFastMdlReadResourceMiss;
+        public uint CcFastMdlReadNotPossible;
+        public uint CcMapDataNoWait;
+        public uint CcMapDataWait;
+        public uint CcMapDataNoWaitMiss;
+        public uint CcMapDataWaitMiss;
+        public uint CcPinMappedDataCount;
+        public uint CcPinReadNoWait;
+        public uint CcPinReadWait;
+        public uint CcPinReadNoWaitMiss;
+        public uint CcPinReadWaitMiss;
+        public uint CcCopyReadNoWait;
+        public uint CcCopyReadWait;
+        public uint CcCopyReadNoWaitMiss;
+        public uint CcCopyReadWaitMiss;
+        public uint CcMdlReadNoWait;
+        public uint CcMdlReadWait;
+        public uint CcMdlReadNoWaitMiss;
+        public uint CcMdlReadWaitMiss;
+        public uint CcReadAheadIos;
+        public uint CcLazyWriteIos;
+        public uint CcLazyWritePages;
+        public uint CcDataFlushes;
+        public uint CcDataPages;
+        public uint ContextSwitches;
+        public uint FirstLevelTbFills;
+        public uint SecondLevelTbFills;
+        public uint SystemCalls;
+        public ulong CcTotalDirtyPages;
+        public ulong CcDirtyPageThreshold;
+        public long ResidentAvailablePages;
+        public ulong SharedCommittedPages;
+    }
+
     [SuppressUnmanagedCodeSecurity]
     public static partial class NtDll {
         const string Library = "ntdll";
+
+        public const int StatusInfoLengthMismatch = unchecked((int)0xc0000004);
 
         [DllImport(Library, ExactSpelling = true)]
         public unsafe static extern int NtQuerySystemInformation(SystemInformationClass infoClass, IntPtr buffer, int size, int* actualSize = null);

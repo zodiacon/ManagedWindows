@@ -13,12 +13,11 @@ namespace ProcessList {
             foreach (var pi in processes) {
                 Console.Write($"{pi.Name} ({pi.Id}) Threads: {pi.Threads} Parent: {pi.ParentId}");
                 if (pi.Id > 0) {
-                    try {
-                        using (var process = NativeProcess.Open(ProcessAccessMask.QueryLimitedInformation, pi.Id)) {
-                            Console.Write($" Start: {process.CreateTime}");
+                    using (var process = NativeProcess.TryOpen(ProcessAccessMask.QueryLimitedInformation, pi.Id)) {
+                        if (process != null) {
+                            Console.Write($" Start: {process.CreateTime} Managed: {process.IsManaged} Protection: {process.Protection} Command Line: {process.CommandLine} ");
                         }
                     }
-                    catch { }
                 }
                 Console.WriteLine();
             }

@@ -84,7 +84,7 @@ namespace Zodiacon.ManagedWindows.Processes {
             get {
                 if (SafeWaitHandle.IsInvalid)
                     throw new InvalidOperationException();
-                return GetProcessTimes(out long start, out long d, out d, out d) ? new DateTime(start) : default(DateTime?);
+                return GetProcessTimes(out long start, out long d, out d, out d) ? new DateTime(start) : default;
             }
         }
 
@@ -95,11 +95,11 @@ namespace Zodiacon.ManagedWindows.Processes {
             }
         }
 
-        public TimeSpan? KernelTime => GetProcessTimes(out long d, out d, out long kernel, out d) ? new TimeSpan(kernel) : default(TimeSpan?);
+        public TimeSpan? KernelTime => GetProcessTimes(out long d, out d, out long kernel, out d) ? new TimeSpan(kernel) : default;
 
-        public TimeSpan? UserTime => GetProcessTimes(out long d, out d, out d, out long user) ? new TimeSpan(user) : default(TimeSpan?);
+        public TimeSpan? UserTime => GetProcessTimes(out long d, out d, out d, out long user) ? new TimeSpan(user) : default;
 
-        public TimeSpan? TotalTime => GetProcessTimes(out long d, out d, out long kernel, out long user) ? new TimeSpan(user + kernel) : default(TimeSpan?);
+        public TimeSpan? TotalTime => GetProcessTimes(out long d, out d, out long kernel, out long user) ? new TimeSpan(user + kernel) : default;
 
         public void Terminate(uint exitCode = 0) {
             using (var handle = OpenProcessHandle(ProcessAccessMask.Terminate)) {
@@ -116,11 +116,23 @@ namespace Zodiacon.ManagedWindows.Processes {
             return OpenProcess(accessMask, false, Id).ThrowIfFailed();
         }
 
-        void OnProcessExited() {
-            ProcessExited?.Invoke(this, EventArgs.Empty);
-        }
+        void OnProcessExited() => ProcessExited?.Invoke(this, EventArgs.Empty);
 
         public int SessionId => ProcessIdToSessionId(Id, out var sessionId) ? sessionId : -1;
+
+        public bool IsManaged => EnumModules()?.FirstOrDefault(module => module.Name.Equals("mscoree.dll", StringComparison.InvariantCultureIgnoreCase)) != null;
+
+        public bool IsInAnyJob => IsProcessInJob(SafeWaitHandle, null, out var injob) && injob;
+
+        public unsafe ProtectionLevel Protection {
+            get {
+                var level = ProtectionLevel.None;
+                NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.ProtectionInformation, &level, sizeof(ProtectionLevel));
+                return level;
+            }
+        }
+
+        public bool IsProtected => Protection == ProtectionLevel.None;
 
         public ModuleInfo[] EnumModules() {
             return SystemInformation.EnumModules(Id);
@@ -181,17 +193,39 @@ namespace Zodiacon.ManagedWindows.Processes {
             }
         }
 
+        public unsafe string CommandLine {
+            get {
+                var buffer = Marshal.AllocHGlobal(1 << 16);
+                if (NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.CommandLineInformation, buffer.ToPointer(), 1 << 16) < 0)
+                    return null;
+
+                var commandLine = new string(((UNICODE_STRING*)buffer.ToPointer())->Buffer);
+                Marshal.FreeHGlobal(buffer);
+                return commandLine;
+            }
+        }
+
         public unsafe HandleInfo[] EnumHandles() {
-            var size = 1 << 18; // should be enough ??
-            var buffer = Marshal.AllocHGlobal(size);
+            var size = 1 << 17;
+            int status;
+            IntPtr buffer = default;
+
             try {
-                int actualSize;
-                var status = NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.HandleInformation, buffer.ToPointer(), size, &actualSize);
+                do {
+                    buffer = Marshal.AllocHGlobal(size);
+                    int actualSize;
+                    status = NtDll.NtQueryInformationProcess(SafeWaitHandle, ProcessInformationClass.HandleInformation, buffer.ToPointer(), size, &actualSize);
+                    if (status == NtDll.StatusInfoLengthMismatch) {
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size = actualSize + (1 << 10)));
+                        continue;
+                    }
+                    break;
+                } while (true);
                 if (status < 0)
                     throw new Win32Exception(status, "Failed to get handle list");
 
                 var info = (PROCESS_HANDLE_SNAPSHOT_INFORMATION*)buffer.ToPointer();
-                var count = info->NumberOfHandles.ToUInt32();
+                var count = info->NumberOfHandles.ToInt32();
                 var handles = (PROCESS_HANDLE_TABLE_ENTRY_INFO*)((byte*)info + sizeof(PROCESS_HANDLE_SNAPSHOT_INFORMATION));
                 var result = new HandleInfo[count];
                 for (uint i = 0; i < count; ++i) {
@@ -203,5 +237,6 @@ namespace Zodiacon.ManagedWindows.Processes {
                 Marshal.FreeHGlobal(buffer);
             }
         }
+
     }
 }

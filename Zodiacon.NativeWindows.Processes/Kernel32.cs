@@ -173,6 +173,38 @@ namespace Zodiacon.ManagedWindows.Processes {
         BackgroundEnd = 0x20000
     }
 
+    [Flags]
+    enum GetModuleHandleFlags {
+        FromAddress = 4,
+        Pin = 1,
+        UnchangedRefCount = 2
+    }
+
+    enum PROCESS_INFORMATION_CLASS {
+        MemoryPriority,
+        MemoryExhaustionInfo,
+        AppMemoryInfo,
+        InPrivateInfo,
+        PowerThrottling,
+        ReservedValue1,           // Used to be for ProcessActivityThrottlePolicyInfo
+        TelemetryCoverageInfo,
+        ProtectionLevelInfo,
+        InformationClassMax
+    }
+
+    public enum ProtectionLevel : byte {
+        System = 0x72,
+        WinTcb = 0x62,
+        WinTcbLight = 0x61,
+        Windows = 0x52,
+        WindowsLight = 0x51,
+        LsaLight = 0x41,
+        AntimalwareLight = 0x31,
+        Authenticode = 0x21,
+        AuthenticodeLight = 0x11,
+        None = 0
+    }
+
     public delegate uint ThreadProc(IntPtr param);
 
     [SuppressUnmanagedCodeSecurity]
@@ -218,6 +250,9 @@ namespace Zodiacon.ManagedWindows.Processes {
         [DllImport(Library, SetLastError = true)]
         public static extern bool IsWow64Process(SafeHandle hProcess, out bool wow64);
 
+        [DllImport(Library, SetLastError = true)]
+        internal unsafe static extern bool GetProcessInformation(SafeHandle hProcess, PROCESS_INFORMATION_CLASS infoClass, void* information, int size);
+
         [DllImport(Library, SetLastError = true, CharSet = CharSet.Unicode)]
         public static extern SafeWaitHandle CreateJobObject(JobObjectSecurity security, string name);
 
@@ -233,8 +268,17 @@ namespace Zodiacon.ManagedWindows.Processes {
         [DllImport(Library, SetLastError = true)]
         public static extern IntPtr CreateThread(IntPtr securityAttributes, UIntPtr stackSize, ThreadProc proc, IntPtr parameter, uint flags, out uint id);
 
+        [DllImport(Library, SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern IntPtr GetModuleHandle(string module);
+
+        [DllImport(Library, SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern bool GetModuleHandleEx(GetModuleHandleFlags flags, string module, out IntPtr hModule);
+
         [DllImport(Library, SetLastError = true)]
         public static extern int GetThreadId(SafeHandle hThread);
+
+        [DllImport(Library, SetLastError = true)]
+        public static extern bool IsProcessInJob(SafeHandle hProcess, SafeHandle hJob, out bool inJob);
 
         [DllImport(Library, SetLastError = true)]
         public static extern int GetProcessIdOfThread(SafeHandle hThread);

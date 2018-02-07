@@ -5,7 +5,7 @@ namespace ModuleList {
     class Program {
         static void Main(string[] args) {
             if (args.Length < 1) {
-                Usage();
+                EnumSystemModules();
                 return;
             }
 
@@ -21,6 +21,13 @@ namespace ModuleList {
             }
             catch (Exception ex) {
                 Console.WriteLine($"{ex.Message}.");
+            }
+        }
+
+        private static void EnumSystemModules() {
+            var modules = SystemInformation.EnumSystemModules();
+            foreach (var module in modules) {
+                Console.WriteLine($"Base: 0x{module.ImageBase.ToInt64():X} Size: 0x{module.ImageSize:X} Path: {module.FullPath}");
             }
         }
 

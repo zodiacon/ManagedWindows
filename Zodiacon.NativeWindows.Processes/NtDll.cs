@@ -20,12 +20,14 @@ namespace Zodiacon.ManagedWindows.Processes {
 
     [StructLayout(LayoutKind.Sequential)]
     struct PROCESS_HANDLE_SNAPSHOT_INFORMATION {
-        public UIntPtr NumberOfHandles;
+        public IntPtr NumberOfHandles;
         UIntPtr Reserved;
     }
 
     static partial class NtDll {
         const string Library = "Ntdll";
+
+        public const int StatusInfoLengthMismatch = unchecked((int)0xc0000004);
 
         [DllImport(Library, ExactSpelling = true)]
         public unsafe static extern int NtQueryInformationThread(SafeHandle hThread, ThreadInformationClass infoClass, out THREAD_BASIC_INFORMATION info, int size, int* actualSize = null);

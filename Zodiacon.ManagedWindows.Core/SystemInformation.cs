@@ -60,8 +60,8 @@ namespace Zodiacon.ManagedWindows.Core {
         public static ModuleInfo[] EnumModules(int pid) {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapModules |
                 (Environment.Is64BitProcess ? CreateToolhelpSnapshotFlags.SnapModules32 : CreateToolhelpSnapshotFlags.None), pid)) {
-                if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if (handle.IsInvalid)
+                    return null;
 
                 var modules = new List<ModuleInfo>(128);
                 var me = new ModuleEntry();
@@ -205,9 +205,10 @@ namespace Zodiacon.ManagedWindows.Core {
             try {
                 do {
                     buffer = Marshal.AllocHGlobal(size);
-                    int status = NtDll.NtQuerySystemInformation(SystemInformationClass.ProcessInformation, buffer, size);
-                    if (status == unchecked((int)0xc0000004)) {  // buffer too small
-                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size *= 2));
+                    int needed;
+                    int status = NtDll.NtQuerySystemInformation(SystemInformationClass.ProcessInformation, buffer, size, &needed);
+                    if (status == NtDll.StatusInfoLengthMismatch) {  // buffer too small
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size = needed + (1 << 10)));
                         continue;
                     }
                     if (status < 0) {
@@ -231,5 +232,77 @@ namespace Zodiacon.ManagedWindows.Core {
                     Marshal.FreeHGlobal(buffer);
             }
         }
+
+        public unsafe static SystemModuleInfo[] EnumSystemModules() {
+            var size = 1 << 18;
+            IntPtr buffer = IntPtr.Zero;
+            try {
+                do {
+                    buffer = Marshal.AllocHGlobal(size);
+                    int needed;
+                    int status = NtDll.NtQuerySystemInformation(SystemInformationClass.ModuleInformationEx, buffer, size, &needed);
+                    if (status == NtDll.StatusInfoLengthMismatch) {  // buffer too small
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size = needed + (1 << 10)));
+                        continue;
+                    }
+                    if (status < 0) {
+                        return null;
+                    }
+                    break;
+                } while (true);
+
+                var modules = new List<SystemModuleInfo>(128);
+
+                var module = (RTL_PROCESS_MODULE_INFORMATION_EX*)buffer.ToPointer();
+                do {
+                    modules.Add(new SystemModuleInfo(module));
+                    if (module->NextOffset == 0)
+                        break;
+                    module = (RTL_PROCESS_MODULE_INFORMATION_EX*)((byte*)module + module->NextOffset);
+                } while (true);
+
+                return modules.ToArray();
+            }
+            finally {
+                if (buffer != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buffer);
+            }
+        }
+
+        public unsafe static ProcessExtendedInformation EnumThreadsInProcess(int pid) {
+            var size = 1 << 18;
+            IntPtr buffer = IntPtr.Zero;
+            try {
+                do {
+                    buffer = Marshal.AllocHGlobal(size);
+                    int needed;
+                    int status = NtDll.NtQuerySystemInformation(SystemInformationClass.ProcessInformation, buffer, size, &needed);
+                    if (status == NtDll.StatusInfoLengthMismatch) {  // buffer too small
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size = needed + (1 << 10)));
+                        continue;
+                    }
+                    if (status < 0) {
+                        return null;
+                    }
+                    break;
+                } while (true);
+
+                var process = (SYSTEM_PROCESS_INFORMATION64*)buffer.ToPointer();
+                do {
+                    if(process->UniqueProcessId.ToInt32() == pid)
+                        return new ProcessExtendedInformation(process);
+
+                    if (process->NextEntryOffset == 0)
+                        break;
+                    process = (SYSTEM_PROCESS_INFORMATION64*)((byte*)process + process->NextEntryOffset);
+                } while (true);
+                return null;
+            }
+            finally {
+                if (buffer != IntPtr.Zero)
+                    Marshal.FreeHGlobal(buffer);
+            }
+        }
+
     }
 }
