@@ -107,6 +107,22 @@ namespace Zodiacon.ManagedWindows.Core {
         RaiseUMExceptionOnInvalidHandleClose = 71,
         IumChallengeResponse = 72,
         ChildProcessInformation = 73,
+        HighGraphicsPriorityInformation = 74,
+        SubsystemInformation = 75,
+        EnergyValues = 76,
+        ActivityThrottleState = 77,
+        ActivityThrottlePolicy = 78,
+        Win32kSyscallFilterInformation = 79,
+        DisableSystemAllowedCpuSets = 80,
+        WakeInformation = 81,
+        EnergyTrackingState = 82,
+        ManageWritesToExecutableMemory = 83,
+        CaptureTrustletLiveDump = 84,
+        TelemetryCoverage = 85,
+        EnclaveInformation = 86,
+        EnableReadWriteVmLogging = 87,
+        UptimeInformation = 88,
+        ImageSection = 89,
         MaxProcessInfoClass
     }
 
@@ -421,6 +437,37 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    struct OBJECT_TYPE_INFORMATION {
+        public UNICODE_STRING TypeName;
+        public uint TotalNumberOfObjects;
+        public uint TotalNumberOfHandles;
+        public uint TotalPagedPoolUsage;
+        public uint TotalNonPagedPoolUsage;
+        public uint TotalNamePoolUsage;
+        public uint TotalHandleTableUsage;
+        public uint HighWaterNumberOfObjects;
+        public uint HighWaterNumberOfHandles;
+        public uint HighWaterPagedPoolUsage;
+        public uint HighWaterNonPagedPoolUsage;
+        public uint HighWaterNamePoolUsage;
+        public uint HighWaterHandleTableUsage;
+        public uint InvalidAttributes;
+        public GENERIC_MAPPING GenericMapping;
+        public uint ValidAccessMask;
+        public byte SecurityRequired;
+        public byte MaintainHandleCount;
+        public uint PoolType;
+        public uint DefaultPagedPoolCharge;
+        public uint DefaultNonPagedPoolCharge;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct OBJECT_TYPES_INFORMATION {
+        public uint NumberOfTypes;
+        //public OBJECT_TYPE_INFORMATION TypeInformation;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     unsafe struct TEB64 {
         public NT_TIB Tib;
         public uint EnvironmentPointer;
@@ -494,7 +541,7 @@ namespace Zodiacon.ManagedWindows.Core {
     [StructLayout(LayoutKind.Explicit)]
     struct SYSTEM_PROCESS_INFORMATION64 {
         [FieldOffset(0)] public uint NextEntryOffset;
-        [FieldOffset(4)] public uint NumberOfThreads;
+        [FieldOffset(4)] public int NumberOfThreads;
         [FieldOffset(8)] public long WorkingSetPrivateSize;
         [FieldOffset(0x10)] public uint HardFaultCount;
         [FieldOffset(0x14)] public uint NumberOfThreadsHighWatermark;
@@ -532,7 +579,7 @@ namespace Zodiacon.ManagedWindows.Core {
     [StructLayout(LayoutKind.Explicit)]
     struct SYSTEM_PROCESS_INFORMATION32 {
         [FieldOffset(0)] public uint NextEntryOffset;
-        [FieldOffset(4)] public uint NumberOfThreads;
+        [FieldOffset(4)] public int NumberOfThreads;
         [FieldOffset(8)] public long WorkingSetPrivateSize;
         [FieldOffset(0x10)] public uint HardFaultCount;
         [FieldOffset(0x14)] public uint NumberOfThreadsHighWatermark;
@@ -648,7 +695,7 @@ namespace Zodiacon.ManagedWindows.Core {
         public long CreateTime;
         public uint WaitTime;
         public IntPtr StartAddress;
-        public CLIENT_ID ClinetId;
+        public CLIENT_ID ClientId;
         public int Priority;
         public int BasePriority;
         public uint ContextSwitches;

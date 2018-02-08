@@ -8,7 +8,7 @@ using Zodiacon.ManagedWindows.Core;
 namespace ProcessThreadList {
     class Program {
         static void Main(string[] args) {
-            var info = SystemInformation.EnumProcessesAndThreads();
+            var info = SystemInformation.EnumProcessesExtended();
             Console.WriteLine($"Total Processes {info.Count}");
 
             foreach (var process in info) {
@@ -18,7 +18,7 @@ namespace ProcessThreadList {
                 if (process.Threads != null)
                     foreach (var thread in process.Threads) {
                         Console.WriteLine($"  Id: {thread.ThreadId} Created: {thread.CreateTime.ToLocalTime()} Pri: {thread.Priority} BasePri: {thread.BasePriority} "
-                           + $"User: {thread.UserTime} Kernel: {thread.KernelTime} CtxSwitch: {thread.ContextSwicthes} Address: {thread.StartAddress} State: {thread.State}"
+                           + $"User: {thread.UserTime} Kernel: {thread.KernelTime} CtxSwitch: {thread.ContextSwitches} Address: {thread.StartAddress} State: {thread.State}"
                            + $" Wait Reason: {thread.WaitReason} Wait time: {thread.WaitTime}");
                     }
             }

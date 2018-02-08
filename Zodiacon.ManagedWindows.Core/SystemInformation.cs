@@ -199,7 +199,7 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
-        public unsafe static IReadOnlyList<ProcessExtendedInformation> EnumProcessesAndThreads() {
+        public unsafe static IReadOnlyList<ProcessExtendedInformation> EnumProcessesExtended(bool includeThreads = false) {
             var size = 1 << 18;
             IntPtr buffer = IntPtr.Zero;
             try {
@@ -220,7 +220,7 @@ namespace Zodiacon.ManagedWindows.Core {
                 var list = new List<ProcessExtendedInformation>(256);
                 var process = (SYSTEM_PROCESS_INFORMATION64*)buffer.ToPointer();
                 do {
-                    list.Add(new ProcessExtendedInformation(process));
+                    list.Add(new ProcessExtendedInformation(process, includeThreads));
                     if (process->NextEntryOffset == 0)
                         break;
                     process = (SYSTEM_PROCESS_INFORMATION64*)((byte*)process + process->NextEntryOffset);
@@ -290,7 +290,7 @@ namespace Zodiacon.ManagedWindows.Core {
                 var process = (SYSTEM_PROCESS_INFORMATION64*)buffer.ToPointer();
                 do {
                     if(process->UniqueProcessId.ToInt32() == pid)
-                        return new ProcessExtendedInformation(process);
+                        return new ProcessExtendedInformation(process, true);
 
                     if (process->NextEntryOffset == 0)
                         break;
