@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Zodiacon.ManagedWindows.Core {
-    public sealed class ProcessInfo {
-        internal ProcessInfo() { }
+    public sealed class ProcessInformation {
+        internal ProcessInformation() { }
 
         public int Id { get; internal set; }
         public string Name { get; internal set; }

@@ -20,6 +20,6 @@ namespace Zodiacon.ManagedWindows.Processes {
         public uint ObjectTypeIndex { get; }
         public uint AccessMask { get;}
         public uint PointerCount { get; }
-        public uint Attributes { get; }
+        public HandleAttributes Attributes { get; }
     }
 }

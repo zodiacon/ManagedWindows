@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Zodiacon.ManagedWindows.Core {
     public static class SystemInformation {
-        public static ProcessInfo[] EnumProcesses() {
+        public static ProcessInformation[] EnumProcesses() {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapProcess)) {
                 if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                var processes = new List<ProcessInfo>(128);
+                var processes = new List<ProcessInformation>(128);
                 var pe = new ProcessEntry();
                 pe.Init();
 
@@ -22,7 +22,7 @@ namespace Zodiacon.ManagedWindows.Core {
                     return null;
 
                 do {
-                    processes.Add(new ProcessInfo {
+                    processes.Add(new ProcessInformation {
                         Id = pe.th32ProcessID,
                         ParentId = pe.th32ParentProcessID,
                         Threads = pe.cntThreads,
@@ -34,12 +34,12 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
-        public static ThreadInfo[] EnumThreads(int pid = -1) {
+        public static ThreadInformation[] EnumThreads(int pid = -1) {
             using (var handle = Win32.CreateToolhelp32Snapshot(CreateToolhelpSnapshotFlags.SnapThread)) {
                 if (handle.DangerousGetHandle() == Win32.InvalidFileHandle)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
-                var threads = new List<ThreadInfo>(1024);
+                var threads = new List<ThreadInformation>(1024);
                 var te = new ThreadEntry();
                 te.Init();
 
@@ -50,7 +50,7 @@ namespace Zodiacon.ManagedWindows.Core {
                     if (pid >= 0 && te.ProcessId != pid)
                         continue;
                     if (te.ThreadId != 0)
-                        threads.Add(new ThreadInfo(te));
+                        threads.Add(new ThreadInformation(te));
                 } while (Win32.Thread32Next(handle, ref te));
 
                 return threads.ToArray();

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Zodiacon.ManagedWindows.Core {
-    public sealed class SystemHandleInfo {
+    public sealed class SystemHandleInfo : IEquatable<SystemHandleInfo> {
         unsafe internal SystemHandleInfo(SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX* info) {
             Object = info->Object;
             Handle = info->HandleValue.ToInt32();
@@ -21,5 +21,11 @@ namespace Zodiacon.ManagedWindows.Core {
         public int ProcessId { get; }
         public uint AccessMask { get; }
         public uint Attributes { get; }
+
+        public bool Equals(SystemHandleInfo other) => ProcessId == other.ProcessId && Handle == other.Handle;
+
+        public override bool Equals(object obj) => Equals((SystemHandleInfo)obj);
+
+        public override int GetHashCode() => ProcessId ^ Handle;
     }
 }

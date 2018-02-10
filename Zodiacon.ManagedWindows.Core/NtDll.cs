@@ -16,6 +16,57 @@ namespace Zodiacon.ManagedWindows.Core {
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    struct OBJECT_TYPE_INFORMATION {
+        public UNICODE_STRING TypeName;
+        public uint TotalNumberOfObjects;
+        public uint TotalNumberOfHandles;
+        public uint TotalPagedPoolUsage;
+        public uint TotalNonPagedPoolUsage;
+        public uint TotalNamePoolUsage;
+        public uint TotalHandleTableUsage;
+        public uint HighWaterNumberOfObjects;
+        public uint HighWaterNumberOfHandles;
+        public uint HighWaterPagedPoolUsage;
+        public uint HighWaterNonPagedPoolUsage;
+        public uint HighWaterNamePoolUsage;
+        public uint HighWaterHandleTableUsage;
+        public uint InvalidAttributes;
+        public GENERIC_MAPPING GenericMapping;
+        public uint ValidAccessMask;
+        public byte SecurityRequired;
+        public byte MaintainHandleCount;
+        public PoolType PoolType;
+        public uint DefaultPagedPoolCharge;
+        public uint DefaultNonPagedPoolCharge;
+    }
+
+    public enum PoolType {
+        NonPagedPool = 0,
+        NonPagedPoolExecute = 0,
+        PagedPool = 1,
+        NonPagedPoolMustSucceed = 2,
+        DontUseThisType = 3,
+        NonPagedPoolCacheAligned = 4,
+        PagedPoolCacheAligned = 5,
+        NonPagedPoolCacheAlignedMustS = 6,
+        MaxPoolType = 7,
+        NonPagedPoolBase = 0,
+        NonPagedPoolBaseMustSucceed = 2,
+        NonPagedPoolBaseCacheAligned = 4,
+        NonPagedPoolBaseCacheAlignedMustS = 6,
+        NonPagedPoolSession = 32,
+        PagedPoolSession = 33,
+        NonPagedPoolMustSucceedSession = 34,
+        DontUseThisTypeSession = 35,
+        NonPagedPoolCacheAlignedSession = 36,
+        PagedPoolCacheAlignedSession = 37,
+        NonPagedPoolCacheAlignedMustSSession = 38,
+        NonPagedPoolNx = 512,
+        NonPagedPoolNxCacheAligned = 516,
+        NonPagedPoolSessionNx = 544
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     struct SYSTEM_OBJECTTYPE_INFORMATION {
         public uint NextEntryOffset;
         public uint NumberOfObjects;
@@ -394,6 +445,10 @@ namespace Zodiacon.ManagedWindows.Core {
         public short Length;
         public short MaximumLengh;
         public char* Buffer;
+
+        public override string ToString() {
+            return new string(Buffer, 0, Length);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -436,30 +491,6 @@ namespace Zodiacon.ManagedWindows.Core {
         public NT_TIB32 Tib;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    struct OBJECT_TYPE_INFORMATION {
-        public UNICODE_STRING TypeName;
-        public uint TotalNumberOfObjects;
-        public uint TotalNumberOfHandles;
-        public uint TotalPagedPoolUsage;
-        public uint TotalNonPagedPoolUsage;
-        public uint TotalNamePoolUsage;
-        public uint TotalHandleTableUsage;
-        public uint HighWaterNumberOfObjects;
-        public uint HighWaterNumberOfHandles;
-        public uint HighWaterPagedPoolUsage;
-        public uint HighWaterNonPagedPoolUsage;
-        public uint HighWaterNamePoolUsage;
-        public uint HighWaterHandleTableUsage;
-        public uint InvalidAttributes;
-        public GENERIC_MAPPING GenericMapping;
-        public uint ValidAccessMask;
-        public byte SecurityRequired;
-        public byte MaintainHandleCount;
-        public uint PoolType;
-        public uint DefaultPagedPoolCharge;
-        public uint DefaultNonPagedPoolCharge;
-    }
 
     [StructLayout(LayoutKind.Sequential)]
     struct OBJECT_TYPES_INFORMATION {
@@ -897,6 +928,20 @@ namespace Zodiacon.ManagedWindows.Core {
         public ulong SharedCommittedPages;
     }
 
+    enum ObjectInformationClass {
+        BasicInformation,
+        NameInformation,
+        TypeInformation,
+        TypesInformation,
+        HandleFlagInformation,
+        SessionInformation,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct OBJECT_NAME_INFORMATION {
+        public UNICODE_STRING Name;
+    }
+
     [SuppressUnmanagedCodeSecurity]
     public static partial class NtDll {
         const string Library = "ntdll";
@@ -917,5 +962,8 @@ namespace Zodiacon.ManagedWindows.Core {
 
         [DllImport(Library, ExactSpelling = true)]
         public static extern int NtQueryInformationThread(SafeHandle hThread, ThreadInformationClass infoClass, IntPtr buffer, uint size, out uint actualSize);
+
+        [DllImport(Library, ExactSpelling = true)]
+        internal unsafe static extern int NtQueryObject(IntPtr hObject, ObjectInformationClass infoClass, void* buffer, int size, int* actualSize = null);
     }
 }

@@ -45,14 +45,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
+    <Compile Include="GenericMapping.cs" />
     <Compile Include="HeapInfo.cs" />
     <Compile Include="HeapBlock.cs" />
     <Compile Include="ModuleInfo.cs" />
+    <Compile Include="NativeObject.cs" />
+    <Compile Include="NativeObjectType.cs" />
     <Compile Include="NtDll.cs" />
     <Compile Include="PageFileInfo.cs" />
     <Compile Include="PerformanceInformation.cs" />
     <Compile Include="ProcessExtendedInformation.cs" />
-    <Compile Include="ProcessInfo.cs" />
+    <Compile Include="ProcessInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SafeKernelHandle.cs" />
     <Compile Include="Session.cs" />
@@ -61,7 +64,7 @@
     <Compile Include="SystemInformation.cs" />
     <Compile Include="SystemModuleInfo.cs" />
     <Compile Include="ThreadExtendedInformation.cs" />
-    <Compile Include="ThreadInfo.cs" />
+    <Compile Include="ThreadInformation.cs" />
     <Compile Include="Win32.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

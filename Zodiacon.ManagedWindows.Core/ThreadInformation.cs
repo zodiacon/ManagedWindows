@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Zodiacon.ManagedWindows.Core {
-    public sealed class ThreadInfo {
+    public sealed class ThreadInformation {
         readonly ThreadEntry _entry;
 
-        internal ThreadInfo(ThreadEntry entry) {
+        internal ThreadInformation(ThreadEntry entry) {
             _entry = entry;
         }
 
