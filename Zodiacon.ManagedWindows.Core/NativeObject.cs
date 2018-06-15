@@ -19,6 +19,28 @@ namespace Zodiacon.ManagedWindows.Core {
             return new NativeObject(handle);
         }
 
+        public unsafe static NativeObject TryOpen(string name, uint accessMask) {
+            if (name[0] != '\\')
+                throw new ArgumentException("object name must start with backslash", nameof(name));
+
+            UNICODE_STRING uname;
+            IntPtr hDirectory = IntPtr.Zero;
+            fixed (char* chars = name) {
+                uname.Buffer = chars;
+                uname.Length = uname.MaximumLengh = (short)(name.Length * 2);
+                var attributes = new OBJECT_ATTRIBUTES(&uname);
+                var status = NtDll.NtOpenDirectoryObject(out hDirectory, DirectoryAccessMask.Query | DirectoryAccessMask.Traverse, ref attributes);
+                if (status < 0)
+                    return null;
+            }
+            return FromHandle(hDirectory);
+        }
+
+        public static NativeObject TryOpen(UIntPtr address, uint accessMask, bool checkAccess = true) {
+            // must utlize a driver for that
+            throw new NotImplementedException();
+        }
+
         public void Dispose() {
             Win32.CloseHandle(_handle);
         }

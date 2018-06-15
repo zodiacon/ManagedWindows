@@ -175,22 +175,31 @@ namespace Zodiacon.ManagedWindows.Core {
             return sessions.ToArray();
         }
 
-        public static unsafe SystemHandleInfo[] EnumHandles() {
+        public static unsafe SystemHandleInformation[] EnumHandles() {
             IntPtr buffer = IntPtr.Zero;
             try {
-                var size = 1 << 23;
+                var size = 1 << 22;
                 buffer = Marshal.AllocHGlobal(size);
-                int actualSize;
-                if (NtDll.NtQuerySystemInformation(SystemInformationClass.ExtendedHandleInformation, buffer, size, &actualSize) < 0)
-                    return null;
+                do {
+                    int actualSize;
+                    var status = NtDll.NtQuerySystemInformation(SystemInformationClass.ExtendedHandleInformation, buffer, size, &actualSize);
+                    if (status == NtDll.StatusInfoLengthMismatch || status == NtDll.StatusInfoLengthTooSmall) {
+                        size = actualSize + 1000;
+                        buffer = Marshal.ReAllocHGlobal(buffer, new IntPtr(size));
+                        continue;
+                    }
+                    else if (status < 0)
+                        return null;
+                    break;
+                } while (true);
 
                 var info = (SYSTEM_HANDLE_INFORMATION_EX*)buffer.ToPointer();
                 var count = info->HandleCount.ToInt32();
                 Debug.Assert(count > 0);
                 var handleInfo = (SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX*)((byte*)info + sizeof(SYSTEM_HANDLE_INFORMATION_EX));
-                var handles = new SystemHandleInfo[count];
+                var handles = new SystemHandleInformation[count];
                 for (uint i = 0; i < count; i++)
-                    handles[i] = new SystemHandleInfo(&handleInfo[i]);
+                    handles[i] = new SystemHandleInformation(&handleInfo[i]);
                 return handles;
             }
             finally {
@@ -289,7 +298,7 @@ namespace Zodiacon.ManagedWindows.Core {
 
                 var process = (SYSTEM_PROCESS_INFORMATION64*)buffer.ToPointer();
                 do {
-                    if(process->UniqueProcessId.ToInt32() == pid)
+                    if (process->UniqueProcessId.ToInt32() == pid)
                         return new ProcessExtendedInformation(process, true);
 
                     if (process->NextEntryOffset == 0)
@@ -304,5 +313,44 @@ namespace Zodiacon.ManagedWindows.Core {
             }
         }
 
+        static KernelObjectType[] _objectTypeInformation;
+        static IDictionary<int, KernelObjectType> _objectTypesDictionary;
+        static object _objectTypesLock = new object();
+
+        public unsafe static KernelObjectType[] EnumObjectTypes(bool refresh = false) {
+            lock (_objectTypesLock) {
+                if (_objectTypeInformation != null && !refresh)
+                    return _objectTypeInformation;
+                int size = 1 << 14, needed;
+                var buffer = Marshal.AllocHGlobal(size);
+                int status = NtDll.NtQueryObject(IntPtr.Zero, ObjectInformationClass.TypesInformation, buffer.ToPointer(), size, &needed);
+                if (status != 0)
+                    return null;
+
+                var types = (OBJECT_TYPES_INFORMATION*)buffer.ToPointer();
+                if(_objectTypeInformation == null)
+                    _objectTypeInformation = new KernelObjectType[types->NumberOfTypes];
+                var typesInfo = (OBJECT_TYPE_INFORMATION*)((byte*)types + IntPtr.Size);
+                for (int i = 0; i < _objectTypeInformation.Length; i++) {
+                    var type = new KernelObjectType(typesInfo);
+                    _objectTypeInformation[i] = type;
+                    var maxLength = typesInfo->TypeName.MaximumLengh;
+                    typesInfo = (OBJECT_TYPE_INFORMATION*)((byte*)typesInfo + Marshal.SizeOf<OBJECT_TYPE_INFORMATION>() + maxLength);
+                    var asNumber = (ulong)typesInfo;
+                    typesInfo = (OBJECT_TYPE_INFORMATION*)(Extensions.AlignUp((ulong)typesInfo, (ulong)IntPtr.Size));
+                }
+                _objectTypesDictionary = _objectTypeInformation.ToDictionary(t => t.Index);
+            }
+            return _objectTypeInformation;
+        }
+
+        public static KernelObjectType GetKernelObjectTypeByIndex(int index) {
+            if (_objectTypesDictionary == null)
+                EnumObjectTypes();
+            if (_objectTypesDictionary == null)
+                return null;
+
+            return _objectTypesDictionary.TryGetValue(index, out var type) ? type : null;
+        }
     }
 }

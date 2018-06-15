@@ -15,7 +15,14 @@ namespace Zodiacon.ManagedWindows.Core {
         public uint GenericAll;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [Flags]
+    public enum HandleAttributes {
+        None = 0,
+        Inheritable = 1,
+        ProtectFromClose = 2
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct OBJECT_TYPE_INFORMATION {
         public UNICODE_STRING TypeName;
         public uint TotalNumberOfObjects;
@@ -35,6 +42,8 @@ namespace Zodiacon.ManagedWindows.Core {
         public uint ValidAccessMask;
         public byte SecurityRequired;
         public byte MaintainHandleCount;
+        public byte TypeIndex;
+        byte Reserved;
         public PoolType PoolType;
         public uint DefaultPagedPoolCharge;
         public uint DefaultNonPagedPoolCharge;
@@ -814,7 +823,7 @@ namespace Zodiacon.ManagedWindows.Core {
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX {
-        public IntPtr Object;
+        public UIntPtr Object;
         public IntPtr UniqueProcessId;
         public IntPtr HandleValue;
         public uint GrantedAccess;
@@ -826,7 +835,7 @@ namespace Zodiacon.ManagedWindows.Core {
 
     [StructLayout(LayoutKind.Sequential)]
     unsafe struct RTL_PROCESS_MODULE_INFORMATION {
-        IntPtr Section; 
+        IntPtr Section;
         public IntPtr MappedBase;
         public IntPtr ImageBase;
         public uint ImageSize;
@@ -942,11 +951,58 @@ namespace Zodiacon.ManagedWindows.Core {
         public UNICODE_STRING Name;
     }
 
+    [Flags]
+    enum ObjectAttributesFlags {
+        None = 0,
+        Inherit = 2,
+        Permanent = 0x10,
+        Exclusive = 0x20,
+        CaseInsensitive = 0x40,
+        OpenIf = 0x80,
+        OpenLink = 0x100,
+        KernelHandle = 0x200,
+        ForceAccessCheck = 0x400,
+        IgnoreImpersonatedDeviceMap = 0x800,
+        DontReparse = 0x1000,
+    }
+
+    [Flags]
+    public enum DirectoryAccessMask : uint {
+        None = 0,
+        Query = 1,
+        Traverse = 2,
+        CreateObject = 4,
+        CreateSubdirectry = 8,
+        AllAccess = GenericAccessRights.StandardRightsRequired | 0xf
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    unsafe struct OBJECT_ATTRIBUTES {
+        int Length;
+        public IntPtr RootDirectory;
+        public UNICODE_STRING* ObjectName;
+        public ObjectAttributesFlags Attributes;
+        public IntPtr SecurityDescriptor;
+        public IntPtr SecurityQualityOfService;
+
+        public OBJECT_ATTRIBUTES(UNICODE_STRING* name, ObjectAttributesFlags flags, IntPtr hRootDirectory) {
+            Length = sizeof(OBJECT_ATTRIBUTES);
+            Attributes = flags;
+            ObjectName = name;
+            SecurityDescriptor = SecurityQualityOfService = IntPtr.Zero;
+            RootDirectory = hRootDirectory;
+        }
+
+        public OBJECT_ATTRIBUTES(UNICODE_STRING* name, ObjectAttributesFlags flags = ObjectAttributesFlags.None) : this(name, flags, IntPtr.Zero) {
+        }
+    }
+
     [SuppressUnmanagedCodeSecurity]
     public static partial class NtDll {
         const string Library = "ntdll";
 
         public const int StatusInfoLengthMismatch = unchecked((int)0xc0000004);
+        public const int StatusInfoLengthTooSmall = unchecked((int)0xc0000023);
 
         [DllImport(Library, ExactSpelling = true)]
         public unsafe static extern int NtQuerySystemInformation(SystemInformationClass infoClass, IntPtr buffer, int size, int* actualSize = null);
@@ -965,5 +1021,8 @@ namespace Zodiacon.ManagedWindows.Core {
 
         [DllImport(Library, ExactSpelling = true)]
         internal unsafe static extern int NtQueryObject(IntPtr hObject, ObjectInformationClass infoClass, void* buffer, int size, int* actualSize = null);
+
+        [DllImport(Library, ExactSpelling = true)]
+        internal static extern int NtOpenDirectoryObject(out IntPtr handle, DirectoryAccessMask accessMask, ref OBJECT_ATTRIBUTES attributes);
     }
 }

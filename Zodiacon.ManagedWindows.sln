@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandleList", "HandleList\Ha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessThreadList", "ProcessThreadList\ProcessThreadList.csproj", "{CA0C3D57-C155-4895-8A1F-311E2B06E214}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zodiacon.ManagedWindows.Devices", "Zodiacon.ManagedWindows.Devices\Zodiacon.ManagedWindows.Devices.csproj", "{C5617429-EC32-4EDF-926E-3E8BC3994BD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobList", "JobList\JobList.csproj", "{F95C7269-61AA-498E-9595-DEDFE1341ED1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +93,14 @@ Global
 		{CA0C3D57-C155-4895-8A1F-311E2B06E214}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA0C3D57-C155-4895-8A1F-311E2B06E214}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA0C3D57-C155-4895-8A1F-311E2B06E214}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5617429-EC32-4EDF-926E-3E8BC3994BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5617429-EC32-4EDF-926E-3E8BC3994BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5617429-EC32-4EDF-926E-3E8BC3994BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5617429-EC32-4EDF-926E-3E8BC3994BD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F95C7269-61AA-498E-9595-DEDFE1341ED1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F95C7269-61AA-498E-9595-DEDFE1341ED1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F95C7269-61AA-498E-9595-DEDFE1341ED1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F95C7269-61AA-498E-9595-DEDFE1341ED1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +116,7 @@ Global
 		{1710965E-E069-4B6F-B6F9-B045367EEDCC} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 		{2DD5FEDA-C21D-4F63-B928-48D47982FBE0} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 		{CA0C3D57-C155-4895-8A1F-311E2B06E214} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
+		{F95C7269-61AA-498E-9595-DEDFE1341ED1} = {8242CF65-5CAE-4B2F-8FB3-AAF6C466103C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6B161822-4FD6-4C00-BFE0-E95C08A1D6AA}

@@ -24,6 +24,10 @@ namespace Zodiacon.ManagedWindows.Processes {
         private NativeJob(SafeWaitHandle hJob) {
             SafeWaitHandle = hJob;
         }
+
+        public void Terminate(int exitCode = 0) {
+            TerminateJobObject(SafeWaitHandle, exitCode).ThrowIfWin32Failed();
+        }
     }
 
 }

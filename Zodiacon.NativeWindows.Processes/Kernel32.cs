@@ -30,7 +30,7 @@ namespace Zodiacon.ManagedWindows.Processes {
         public IntPtr QuotaPagedPoolUsage;
         public IntPtr QuotaPeakNonPagedPoolUsage;
         public IntPtr QuotaNonPagedPoolUsage;
-        IntPtr PagefileUsage;
+        public IntPtr PagefileUsage;
         public IntPtr PeakPagefileUsage;
         public IntPtr PrivateUsage;
     }
@@ -324,6 +324,9 @@ namespace Zodiacon.ManagedWindows.Processes {
 
         [DllImport(Library)]
         internal static extern IoCompletionResult SleepEx(int msec, bool alertable);
+
+        [DllImport(Library, SetLastError = true)]
+        internal static extern bool TerminateJobObject(SafeWaitHandle hJob, int exitCode);
 
 
     }

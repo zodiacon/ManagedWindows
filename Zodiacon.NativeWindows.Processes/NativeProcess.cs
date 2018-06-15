@@ -205,7 +205,7 @@ namespace Zodiacon.ManagedWindows.Processes {
             }
         }
 
-        public unsafe HandleInfo[] EnumHandles() {
+        public unsafe HandleInformation[] EnumHandles() {
             var size = 1 << 17;
             int status;
             IntPtr buffer = default;
@@ -227,9 +227,9 @@ namespace Zodiacon.ManagedWindows.Processes {
                 var info = (PROCESS_HANDLE_SNAPSHOT_INFORMATION*)buffer.ToPointer();
                 var count = info->NumberOfHandles.ToInt32();
                 var handles = (PROCESS_HANDLE_TABLE_ENTRY_INFO*)((byte*)info + sizeof(PROCESS_HANDLE_SNAPSHOT_INFORMATION));
-                var result = new HandleInfo[count];
+                var result = new HandleInformation[count];
                 for (uint i = 0; i < count; ++i) {
-                    result[i] = new HandleInfo(&handles[i]);
+                    result[i] = new HandleInformation(&handles[i]);
                 }
                 return result;
             }

@@ -36,5 +36,12 @@ namespace Zodiacon.ManagedWindows {
             Win32.DuplicateHandle(Win32.GetCurrentProcess(), handle, Win32.GetCurrentProcess(), out var result, accessMask, false, DuplicateHandleOptions.None).ThrowIfWin32Failed();
             return result;
         }
+
+        public unsafe static ulong AlignUp(ulong address, ulong amount) {
+            address = (address + amount - 1) & ~(amount - 1);
+//            address += (address & ~(amount - 1));
+            return address;
+        }
+
     }
 }

@@ -15,7 +15,7 @@ namespace HandleList {
                 var handles = SystemInformation.EnumHandles();
                 Console.WriteLine($"Total handles: {handles.Length}");
                 foreach (var handle in handles) {
-                    Console.WriteLine($"H: 0x{handle.Handle:X4}\tPID: {handle.ProcessId}\tObject: 0x{handle.Object.ToInt64():X}\tType: {handle.ObjectTypeIndex,2} Access: 0x{handle.AccessMask:X8}");
+                    Console.WriteLine($"H: 0x{handle.Handle:X4}\tPID: {handle.ProcessId}\tObject: 0x{handle.Object.ToUInt64():X}\tType: {handle.ObjectTypeIndex,2} Access: 0x{handle.AccessMask:X8}");
                 }
             }
             else {

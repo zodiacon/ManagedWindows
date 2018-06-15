@@ -7,12 +7,6 @@ using System.Threading.Tasks;
 using Zodiacon.ManagedWindows.Core;
 
 namespace Zodiacon.ManagedWindows.Processes {
-    [Flags]
-    public enum HandleAttributes {
-        None = 0,
-        Inheritable = 1,
-        ProtectFromClose = 2
-    }
 
     [StructLayout(LayoutKind.Sequential)]
     struct PROCESS_HANDLE_TABLE_ENTRY_INFO {
